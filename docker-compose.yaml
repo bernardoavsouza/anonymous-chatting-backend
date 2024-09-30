@@ -1,0 +1,8 @@
+services:
+  app:
+    container_name: anonymous-chatting-backend
+    build: .
+    ports:
+      - '3000:3000'
+    volumes:
+      - .:/app
