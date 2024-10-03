@@ -7,7 +7,7 @@
     "build": "tsc",
     "dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
     "test-watch": "jest --watch",
-    "test": "jest --bail",
+    "test": "jest",
     "prepare": "husky",
     "precommit": "lint-staged && pnpm run test --passWithNoTests"
   },
