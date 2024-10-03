@@ -19,9 +19,12 @@
     "*.{js,jsx,ts,tsx}": "eslint --fix"
   },
   "devDependencies": {
+    "@babel/plugin-transform-modules-commonjs": "^7.25.7",
     "@commitlint/cli": "^19.5.0",
     "@commitlint/config-conventional": "^19.5.0",
     "@eslint/js": "^9.11.1",
+    "@jest/globals": "^29.7.0",
+    "@types/eslint__js": "^8.42.3",
     "@types/jest": "^29.5.13",
     "eslint": "^9.11.1",
     "eslint-config-prettier": "^9.1.0",
@@ -32,9 +35,16 @@
     "lint-staged": "^15.2.10",
     "nodemon": "^3.1.7",
     "prettier": "^3.3.3",
+    "socket.io-client": "^4.8.0",
+    "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.6.2",
     "typescript-eslint": "^8.7.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "socket.io": "^4.8.0"
   },
   "engines": {
     "node": "20.11.1",
