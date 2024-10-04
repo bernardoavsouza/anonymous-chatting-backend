@@ -1,9 +1,9 @@
 import { wsServer } from './config/server';
-import { io as Client } from 'socket.io-client';
+import { io as Client, Socket } from 'socket.io-client';
 import { createServer } from 'http';
 
 describe('Ensure that the websocket server working fine', () => {
-  let client;
+  let client: Socket;
   const httpServer = createServer();
   const protocol = process.env.protocol || 'http';
   const host = process.env.host || 'localhost';
