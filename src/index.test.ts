@@ -6,7 +6,7 @@ import { ServerUrl } from './utils/server-utils';
 describe('Ensure that the websocket server working fine', () => {
   let client: Socket;
   const httpServer = createServer();
-  const serverUrl = ServerUrl.getInstance();
+  const serverUrl = ServerUrl.getServerData();
 
   beforeAll((done) => {
     wsServer.attach(httpServer);
