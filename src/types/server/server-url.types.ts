@@ -1,4 +1,4 @@
-export type TServerData = {
+export type TServerUrlData = {
   protocol: string;
   host: string;
   port: number;

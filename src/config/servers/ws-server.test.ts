@@ -1,12 +1,12 @@
-import { wsServer } from './config/server';
+import { wsServer } from './ws-server';
 import { io as Client, Socket } from 'socket.io-client';
 import { createServer } from 'http';
-import { ServerUrl } from './utils/server-utils';
+import { ServerUrl } from './server-url';
 
 describe('Ensure that the websocket server working fine', () => {
   let client: Socket;
   const httpServer = createServer();
-  const serverUrl = ServerUrl.getServerData();
+  const serverUrl = ServerUrl.getData();
 
   beforeAll((done) => {
     wsServer.attach(httpServer);

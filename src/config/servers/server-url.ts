@@ -1,4 +1,4 @@
-import { TServerData } from '../types/utils/server.types';
+import { TServerUrlData } from '../../types/server/server-url.types';
 
 export class ServerUrl {
   private static protocol: string = process.env.PROTOCOL || 'http';
@@ -6,7 +6,7 @@ export class ServerUrl {
   private static port: number = +(process.env.PORT || '3000');
   private static url: string = `${this.protocol}://${this.host}:${this.port}`;
 
-  public static getServerData(): TServerData {
+  public static getData(): TServerUrlData {
     return {
       protocol: this.protocol,
       host: this.host,

@@ -1,14 +1,14 @@
-import { ServerUrl } from './server-utils';
+import { ServerUrl } from './server-url';
 
 describe('URL Parser Class', () => {
   test('The returned class should only have protocol, host, port and url attributes', () => {
-    const serverUrl = ServerUrl.getServerData();
+    const serverUrl = ServerUrl.getData();
     const attributes = Object.keys(serverUrl);
     expect(attributes).toEqual(['protocol', 'host', 'port', 'url']);
   });
 
   test('Class attributes should be right', () => {
-    const serverUrl = ServerUrl.getServerData();
+    const serverUrl = ServerUrl.getData();
     const protocol = process.env.PROTOCOL || 'http';
     const host = process.env.HOST || 'localhost';
     const port = +(process.env.PORT || '3000');
