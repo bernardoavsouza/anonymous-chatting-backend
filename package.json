@@ -9,7 +9,7 @@
     "test-watch": "jest --watch",
     "test": "jest",
     "prepare": "husky",
-    "precommit": "lint-staged && pnpm run test --passWithNoTests"
+    "precommit": "lint-staged && pnpm run build && pnpm run test --passWithNoTests"
   },
   "keywords": [],
   "author": "",
