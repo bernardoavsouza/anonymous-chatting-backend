@@ -1,10 +1,14 @@
 FROM node:20.11.1-slim
+ENV NODE_ENV=development
 
 WORKDIR /app
 
-COPY . .
+COPY package.json pnpm-lock.yaml ./
 
 RUN npm install -g pnpm@9.9.0
+RUN pnpm install --frozen-lockfile
+
+COPY . .
 
 EXPOSE 3000
 ENTRYPOINT [ "pnpm", "run" ]
