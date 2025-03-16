@@ -1,4 +1,2 @@
 import { Server } from 'socket.io';
-const wsServer = new Server();
-
-export { wsServer };
+export const wsServer = new Server(3000);
