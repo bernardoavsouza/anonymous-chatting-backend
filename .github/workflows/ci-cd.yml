@@ -23,7 +23,7 @@ jobs:
           version: 9.9.0
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --prod
+        run: pnpm install --frozen-lockfile --prod --ignore-scripts
 
       - name: Check Build
         run: pnpm run build
@@ -46,7 +46,7 @@ jobs:
           version: 9.9.0
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --prod
+        run: pnpm install --frozen-lockfile --prod --ignore-scripts
 
       - name: Run tests
         run: pnpm run test
@@ -69,7 +69,7 @@ jobs:
           version: 9.9.0
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --prod
+        run: pnpm install --frozen-lockfile --prod --ignore-scripts
 
       - name: Run linter
         run: pnpm run lint
