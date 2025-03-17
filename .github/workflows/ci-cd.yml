@@ -38,7 +38,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '22.11.1'
+          node-version-file: package.json
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -61,7 +61,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '22.11.1'
+          node-version-file: package.json
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
