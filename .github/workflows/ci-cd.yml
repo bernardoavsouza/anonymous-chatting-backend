@@ -6,7 +6,7 @@ on:
       - production
 
 jobs:
-  lint:
+  ci-setup:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -22,13 +22,46 @@ jobs:
         with:
           version: 9.9.0
 
+      - name: Restore cached dependencies
+        uses: actions/cache@v4
+        with:
+          path: '**/node_modules'
+          key: pnpm-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            pnpm-${{ runner.os }}-
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+  lint:
+    needs: ci-setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.9.0
+
+      - name: Restore dependencies
+        uses: actions/cache@v4
+        with:
+          path: '**/node_modules'
+          key: pnpm-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            pnpm-${{ runner.os }}-
 
       - name: Run linter
         run: pnpm run lint
   build:
-    needs: lint
+    needs: ci-setup
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -44,14 +77,19 @@ jobs:
         with:
           version: 9.9.0
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Restore cached dependencies
+        uses: actions/cache@v4
+        with:
+          path: '**/node_modules'
+          key: pnpm-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            pnpm-${{ runner.os }}-
 
       - name: Check Build
         run: pnpm run build
 
   test:
-    needs: build
+    needs: ci-setup
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -67,8 +105,13 @@ jobs:
         with:
           version: 9.9.0
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Restore cached dependencies
+        uses: actions/cache@v4
+        with:
+          path: '**/node_modules'
+          key: pnpm-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            pnpm-${{ runner.os }}-
 
       - name: Run tests
         run: pnpm run test
