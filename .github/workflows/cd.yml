@@ -66,5 +66,5 @@ jobs:
           flags: |
             --port 3000
             --allow-unauthenticated
-            --max-instances=1
+            --max-instances 1
             --timeout 5m
