@@ -1,7 +1,26 @@
-import { wsServer } from './config/servers/ws-server';
+import { Server } from 'socket.io';
+import wsConfigs from './config/servers/ws';
+import { PingController } from './infra/ws/events/ping.controller';
 
-wsServer.on('connection', (socket) => {
-  socket.on('message', () => {
-    wsServer.emit('message', 'Hello world!');
-  });
-});
+export class WsServer {
+  private static instance: WsServer;
+  connection: Server;
+
+  private constructor() {
+    this.connection = new Server(wsConfigs.port);
+    this.loadEvents();
+  }
+
+  public static getInstance(): WsServer {
+    if (!this.instance) {
+      this.instance = new WsServer();
+    }
+    return this.instance;
+  }
+
+  private loadEvents(): void {
+    new PingController().load(this);
+  }
+}
+
+export const wsServer = WsServer.getInstance();

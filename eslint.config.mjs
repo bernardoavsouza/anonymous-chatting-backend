@@ -9,4 +9,11 @@ export default tseslint.config(
   eslintPluginPrettier,
   { ignores: ['**/node_modules/**', '**/dist/**'] },
   { files: ['src/**.ts'] },
+  {
+    rules: {
+      '@typescript-eslint/no-extraneous-class': 'off',
+      '@typescript-eslint/explicit-function-return-type': 'error',
+      '@typescript-eslint/consistent-type-imports': 'error',
+    },
+  },
 );
