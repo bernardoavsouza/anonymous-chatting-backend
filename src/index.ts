@@ -8,6 +8,7 @@ export class WsServer {
 
   private constructor() {
     this.connection = new Server(wsConfigs.port);
+    this.startUpLog();
     this.loadEvents();
   }
 
@@ -16,6 +17,10 @@ export class WsServer {
       this.instance = new WsServer();
     }
     return this.instance;
+  }
+
+  private startUpLog(): void {
+    console.log(`Socket.IO server running on port ${wsConfigs.port}`);
   }
 
   private loadEvents(): void {
