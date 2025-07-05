@@ -29,9 +29,9 @@
     "noImplicitOverride": true,
     "allowUnusedLabels": true,
     "allowUnreachableCode": true,
-    "skipLibCheck": true
-  },
-  "paths": {
-    "@/*": ["./src/*"]
+    "skipLibCheck": true,
+    "paths": {
+      "@/*": ["src/*"]
+    }
   }
 }
