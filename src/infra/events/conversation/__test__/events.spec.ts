@@ -1,31 +1,21 @@
+import { getDummyMessage, MockedSocket } from '@/__mocks__/socket.io';
+import { Test, type TestingModule } from '@nestjs/testing';
 import type { Socket } from 'socket.io';
 import { ConversationGateway } from '../gateway';
-import type { Message } from 'src/core/message.interface';
-import { Test, type TestingModule } from '@nestjs/testing';
 
 describe('Conversation events tests', () => {
-  let socket: Socket;
+  let socket: jest.Mocked<Socket>;
   let app: TestingModule;
-  beforeAll(() => {
-    socket = {
-      emit: jest.fn(),
-      to: jest.fn().mockReturnValue({ emit: jest.fn() }),
-    } as unknown as Socket;
-  });
 
   beforeAll(async () => {
+    socket = MockedSocket();
     app = await Test.createTestingModule({
       providers: [ConversationGateway],
     }).compile();
   });
 
   it('should forward content for the same room on "message" event', () => {
-    const messageData: Message = {
-      content: 'dummy message',
-      conversationId: 'dummy conversationId',
-      senderId: 'dummy senderId',
-      timestamp: new Date(2020, 1, 2, 3, 4, 5, 6),
-    };
+    const messageData = getDummyMessage();
 
     const conversationGateway =
       app.get<ConversationGateway>(ConversationGateway);

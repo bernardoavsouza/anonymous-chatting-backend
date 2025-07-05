@@ -1,10 +1,10 @@
+import { Message } from '@/core/message.interface';
 import {
   ConnectedSocket,
   MessageBody,
   WebSocketGateway,
 } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
-import { Message } from 'src/core/message.interface';
 
 @WebSocketGateway()
 export class ConversationGateway {
