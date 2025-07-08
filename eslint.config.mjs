@@ -1,10 +1,10 @@
 // @ts-check
 import eslint from '@eslint/js';
+import jest from 'eslint-plugin-jest';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
+import unusedImports from 'eslint-plugin-unused-imports';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
-import jest from 'eslint-plugin-jest';
-import unusedImports from 'eslint-plugin-unused-imports';
 
 export default tseslint.config(
   {
@@ -57,6 +57,7 @@ export default tseslint.config(
           allowEmpty: true,
         },
       ],
+      '@typescript-eslint/explicit-function-return-type': 'error',
       'unused-imports/no-unused-imports': 'error',
       'unused-imports/no-unused-vars': [
         'warn',
