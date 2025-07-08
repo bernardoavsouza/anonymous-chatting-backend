@@ -1,7 +1,5 @@
 export enum ConversationEvent {
-  MESSAGE = 'message',
-  JOIN = 'join',
-  LEAVE = 'leave',
-  DISCONNECT = 'disconnect',
-  CONNECT = 'connect',
+  MESSAGE = 'conversation:message',
+  JOIN = 'conversation:join',
+  LEAVE = 'conversation:leave',
 }

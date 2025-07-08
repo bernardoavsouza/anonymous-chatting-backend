@@ -6,9 +6,6 @@ export class InputPort<T> {
   data: T;
 
   @IsDate()
-  @Transform(({ value }) => {
-    console.log(value);
-    return new Date(value);
-  })
+  @Transform(({ value }) => new Date(value))
   timestamp: Date;
 }

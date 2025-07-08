@@ -1,33 +1,67 @@
-import { getDummyMessage, MockedSocket } from '@/__mocks__/socket.io';
-import { Test, type TestingModule } from '@nestjs/testing';
+import {
+  dummyConversation,
+  dummyMessage,
+  dummyUser,
+  MockedSocket,
+} from '@/__mocks__/socket.io';
+import { Test } from '@nestjs/testing';
 import type { Socket } from 'socket.io';
 import { ConversationGateway } from '../gateway';
+import { ConversationEvent } from '../types';
 
 describe('Conversation events tests', () => {
   let socket: jest.Mocked<Socket>;
-  let app: TestingModule;
+  let conversationGateway: ConversationGateway;
 
   beforeAll(async () => {
     socket = MockedSocket();
-    app = await Test.createTestingModule({
+    const app = await Test.createTestingModule({
       providers: [ConversationGateway],
     }).compile();
+
+    conversationGateway = app.get<ConversationGateway>(ConversationGateway);
   });
 
   it('should forward content for the same room on "message" event', () => {
-    const messageData = getDummyMessage();
-
-    const conversationGateway =
-      app.get<ConversationGateway>(ConversationGateway);
     conversationGateway.handleMessage(
-      { data: messageData, timestamp: new Date() },
+      { data: dummyMessage, timestamp: new Date() },
       socket,
     );
 
-    expect(socket.to).toHaveBeenCalledWith(messageData.conversationId);
-    expect(socket.to(messageData.conversationId).emit).toHaveBeenCalledWith(
-      'message',
-      messageData,
+    expect(socket.to).toHaveBeenCalledWith(dummyMessage.conversationId);
+    expect(socket.to(dummyMessage.conversationId).emit).toHaveBeenCalledWith(
+      ConversationEvent.MESSAGE,
+      dummyMessage,
     );
+  });
+
+  it('should join room on conversation join event', () => {
+    conversationGateway.handleJoin(
+      {
+        data: {
+          user: dummyUser,
+          conversationId: dummyConversation.id,
+        },
+        timestamp: new Date(),
+      },
+      socket,
+    );
+
+    expect(socket.join).toHaveBeenCalledWith(dummyConversation.id);
+  });
+
+  it('should leave room on conversation leave event', () => {
+    conversationGateway.handleLeave(
+      {
+        data: {
+          user: dummyUser,
+          conversationId: dummyConversation.id,
+        },
+        timestamp: new Date(),
+      },
+      socket,
+    );
+
+    expect(socket.leave).toHaveBeenCalledWith(dummyConversation.id);
   });
 });

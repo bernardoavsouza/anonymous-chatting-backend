@@ -1,12 +1,14 @@
 import { IsString, IsUUID } from 'class-validator';
+import { Conversation } from './conversation.interface';
+import { User } from './user.interface';
 
 export class Message {
   @IsString()
   content: string;
 
   @IsUUID()
-  conversationId: string;
+  conversationId: Conversation['id'];
 
   @IsUUID()
-  senderId: string;
+  senderId: User['id'];
 }
