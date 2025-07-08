@@ -1,4 +1,4 @@
-import { Message } from '@/core/message.interface';
+import { InputPort } from '@/core/ports.interfaces';
 import {
   ConnectedSocket,
   MessageBody,
@@ -6,15 +6,20 @@ import {
   WebSocketGateway,
 } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
+import { ConversationMessageInputDTO } from './dto';
 import { ConversationEvent } from './types';
 
 @WebSocketGateway()
 export class ConversationGateway {
   @SubscribeMessage(ConversationEvent.MESSAGE)
   handleMessage(
-    @MessageBody() data: Message,
+    @MessageBody()
+    input: InputPort<ConversationMessageInputDTO>,
+
     @ConnectedSocket() client: Socket,
-  ) {
-    client.to(data.conversationId).emit(ConversationEvent.MESSAGE, data);
+  ): void {
+    client
+      .to(input.data.conversationId)
+      .emit(ConversationEvent.MESSAGE, input.data);
   }
 }

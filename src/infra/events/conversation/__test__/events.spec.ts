@@ -19,7 +19,10 @@ describe('Conversation events tests', () => {
 
     const conversationGateway =
       app.get<ConversationGateway>(ConversationGateway);
-    conversationGateway.handleMessage(messageData, socket);
+    conversationGateway.handleMessage(
+      { data: messageData, timestamp: new Date() },
+      socket,
+    );
 
     expect(socket.to).toHaveBeenCalledWith(messageData.conversationId);
     expect(socket.to(messageData.conversationId).emit).toHaveBeenCalledWith(

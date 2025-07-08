@@ -17,5 +17,4 @@ export const getDummyMessage: () => Message = () => ({
   content: 'dummy message',
   conversationId: 'dummy conversationId',
   senderId: 'dummy senderId',
-  timestamp: new Date(),
 });
