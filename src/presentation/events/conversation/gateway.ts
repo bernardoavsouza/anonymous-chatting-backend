@@ -1,6 +1,6 @@
 import { ConversationService } from '@/application/conversation/service';
-import { InputPort } from '@/core/ports.interfaces';
-import { BaseWebSocketGateway } from '@/infra/decorators/ws';
+import { BaseWebSocketGateway } from '@/presentation/decorators/ws-gateway';
+import { InputPort } from '@/presentation/ports';
 import {
   ConnectedSocket,
   MessageBody,

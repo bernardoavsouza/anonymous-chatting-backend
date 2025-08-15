@@ -1,5 +1,5 @@
-import { InputPort } from '@/core/ports.interfaces';
-import { ConversationEvent } from '@/infra/events/conversation/types';
+import { ConversationEvent } from '@/presentation/events/conversation/types';
+import { InputPort } from '@/presentation/ports';
 import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
 import {

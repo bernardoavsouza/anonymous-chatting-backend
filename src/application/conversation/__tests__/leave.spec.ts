@@ -3,7 +3,7 @@ import {
   dummyUser,
   MockedSocket,
 } from '@/__mocks__/socket.io';
-import { ConversationEvent } from '@/infra/events/conversation/types';
+import { ConversationEvent } from '@/presentation/events/conversation/types';
 import type { Socket } from 'socket.io';
 import { ConversationService } from '../service';
 

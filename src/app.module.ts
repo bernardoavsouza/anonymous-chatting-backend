@@ -1,6 +1,6 @@
 import { AppController } from '@/app.controller';
 import { AppService } from '@/app.service';
-import { EventsModule } from '@/infra/events/module';
+import { EventsModule } from '@/presentation/events/module';
 import { ClassSerializerInterceptor, Module } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 

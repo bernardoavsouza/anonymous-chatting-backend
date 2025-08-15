@@ -3,9 +3,9 @@ import {
   dummyUser,
   MockedSocket,
 } from '@/__mocks__/socket.io';
-import type { InputPort } from '@/core/ports.interfaces';
-import type { ConversationJoinInputDTO } from '@/infra/events/conversation/dto';
-import { ConversationEvent } from '@/infra/events/conversation/types';
+import type { ConversationJoinInputDTO } from '@/presentation/events/conversation/dto';
+import { ConversationEvent } from '@/presentation/events/conversation/types';
+import type { InputPort } from '@/presentation/ports';
 import type { Socket } from 'socket.io';
 import { ConversationService } from '../service';
 
