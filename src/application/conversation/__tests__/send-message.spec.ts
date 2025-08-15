@@ -18,7 +18,10 @@ describe('Conversation message service', () => {
     expect(socket.to).toHaveBeenCalledWith(dummyMessage.conversationId);
     expect(socket.to(dummyMessage.conversationId).emit).toHaveBeenCalledWith(
       ConversationEvent.MESSAGE,
-      dummyMessage,
+      {
+        data: dummyMessage,
+        timestamp: expect.any(Date),
+      },
     );
   });
 });

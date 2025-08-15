@@ -1,3 +1,4 @@
+import { InputPort } from '@/core/ports.interfaces';
 import { ConversationEvent } from '@/infra/events/conversation/types';
 import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
@@ -11,15 +12,24 @@ import {
 export class ConversationService {
   join(socket: Socket, data: ConversationJoinServiceDTO): void {
     socket.join(data.conversationId);
-    socket.to(data.conversationId).emit(ConversationEvent.JOIN, data);
+    socket.to(data.conversationId).emit(ConversationEvent.JOIN, {
+      data,
+      timestamp: new Date(),
+    } satisfies InputPort<ConversationJoinServiceDTO>);
   }
 
   sendMessage(socket: Socket, data: ConversationMessageServiceDTO): void {
-    socket.to(data.conversationId).emit(ConversationEvent.MESSAGE, data);
+    socket.to(data.conversationId).emit(ConversationEvent.MESSAGE, {
+      data,
+      timestamp: new Date(),
+    } satisfies InputPort<ConversationMessageServiceDTO>);
   }
 
   leave(socket: Socket, data: ConversationLeaveServiceDTO): void {
     socket.leave(data.conversationId);
-    socket.to(data.conversationId).emit(ConversationEvent.LEAVE, data);
+    socket.to(data.conversationId).emit(ConversationEvent.LEAVE, {
+      data,
+      timestamp: new Date(),
+    } satisfies InputPort<ConversationLeaveServiceDTO>);
   }
 }

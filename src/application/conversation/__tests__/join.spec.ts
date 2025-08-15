@@ -3,6 +3,8 @@ import {
   dummyUser,
   MockedSocket,
 } from '@/__mocks__/socket.io';
+import type { InputPort } from '@/core/ports.interfaces';
+import type { ConversationJoinInputDTO } from '@/infra/events/conversation/dto';
 import { ConversationEvent } from '@/infra/events/conversation/types';
 import type { Socket } from 'socket.io';
 import { ConversationService } from '../service';
@@ -33,8 +35,11 @@ describe('Conversation join service', () => {
 
     expect(socket.to).toHaveBeenCalledWith(dummyConversation.id);
     expect(socket.emit).toHaveBeenCalledWith(ConversationEvent.JOIN, {
-      conversationId: dummyConversation.id,
-      user: dummyUser,
-    });
+      data: {
+        conversationId: dummyConversation.id,
+        user: dummyUser,
+      },
+      timestamp: expect.any(Date),
+    } satisfies InputPort<ConversationJoinInputDTO>);
   });
 });

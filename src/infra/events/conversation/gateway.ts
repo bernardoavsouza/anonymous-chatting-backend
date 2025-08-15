@@ -1,10 +1,10 @@
 import { ConversationService } from '@/application/conversation/service';
 import { InputPort } from '@/core/ports.interfaces';
+import { BaseWebSocketGateway } from '@/infra/decorators/ws';
 import {
   ConnectedSocket,
   MessageBody,
   SubscribeMessage,
-  WebSocketGateway,
 } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
 import {
@@ -14,7 +14,7 @@ import {
 } from './dto';
 import { ConversationEvent } from './types';
 
-@WebSocketGateway()
+@BaseWebSocketGateway()
 export class ConversationGateway {
   constructor(private readonly conversationService: ConversationService) {}
 
