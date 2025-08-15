@@ -1,3 +1,4 @@
+import { ConversationService } from '@/application/conversation/service';
 import { InputPort } from '@/core/ports.interfaces';
 import {
   ConnectedSocket,
@@ -15,17 +16,7 @@ import { ConversationEvent } from './types';
 
 @WebSocketGateway()
 export class ConversationGateway {
-  @SubscribeMessage(ConversationEvent.MESSAGE)
-  handleMessage(
-    @MessageBody()
-    input: InputPort<ConversationMessageInputDTO>,
-
-    @ConnectedSocket() client: Socket,
-  ): void {
-    client
-      .to(input.data.conversationId)
-      .emit(ConversationEvent.MESSAGE, input.data);
-  }
+  constructor(private readonly conversationService: ConversationService) {}
 
   @SubscribeMessage(ConversationEvent.JOIN)
   handleJoin(
@@ -33,7 +24,19 @@ export class ConversationGateway {
     input: InputPort<ConversationJoinInputDTO>,
     @ConnectedSocket() client: Socket,
   ): void {
-    client.join(input.data.conversationId);
+    this.conversationService.join(client, input.data);
+  }
+
+  @SubscribeMessage(ConversationEvent.MESSAGE)
+  handleMessage(
+    @MessageBody()
+    input: InputPort<ConversationMessageInputDTO>,
+
+    @ConnectedSocket() client: Socket,
+  ): void {
+    if (!client.rooms.has(input.data.conversationId)) return;
+
+    this.conversationService.sendMessage(client, input.data);
   }
 
   @SubscribeMessage(ConversationEvent.LEAVE)
@@ -42,6 +45,6 @@ export class ConversationGateway {
     input: InputPort<ConversationLeaveInputDTO>,
     @ConnectedSocket() client: Socket,
   ): void {
-    client.leave(input.data.conversationId);
+    this.conversationService.leave(client, input.data);
   }
 }

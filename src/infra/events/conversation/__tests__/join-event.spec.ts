@@ -1,0 +1,53 @@
+import {
+  dummyConversation,
+  dummyDate,
+  dummyUser,
+  MockedSocket,
+} from '@/__mocks__/socket.io';
+import { ConversationService } from '@/application/conversation/service';
+import { Test } from '@nestjs/testing';
+import type { Socket } from 'socket.io';
+import { ConversationGateway } from '../gateway';
+
+describe('Conversation join event', () => {
+  let socket: Socket;
+  let conversationGateway: ConversationGateway;
+  let service: ConversationService;
+
+  const conversationServiceMock = {
+    join: jest.fn(),
+  };
+
+  beforeAll(async () => {
+    socket = MockedSocket();
+    const app = await Test.createTestingModule({
+      providers: [
+        ConversationGateway,
+        {
+          provide: ConversationService,
+          useValue: conversationServiceMock,
+        },
+      ],
+    }).compile();
+    conversationGateway = app.get<ConversationGateway>(ConversationGateway);
+    service = app.get<ConversationService>(ConversationService);
+  });
+
+  it('should trigger join method of conversation service properly', async () => {
+    conversationGateway.handleJoin(
+      {
+        data: {
+          user: dummyUser,
+          conversationId: dummyConversation.id,
+        },
+        timestamp: dummyDate,
+      },
+      socket,
+    );
+
+    expect(service.join).toHaveBeenCalledWith(socket, {
+      conversationId: dummyConversation.id,
+      user: dummyUser,
+    });
+  });
+});
