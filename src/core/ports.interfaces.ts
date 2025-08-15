@@ -1,8 +1,8 @@
 import { Transform } from 'class-transformer';
-import { IsDate, ValidateNested } from 'class-validator';
+import { IsDate, IsObject } from 'class-validator';
 
 export class InputPort<T> {
-  @ValidateNested()
+  @IsObject()
   data: T;
 
   @IsDate()
