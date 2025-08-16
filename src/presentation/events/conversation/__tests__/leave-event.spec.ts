@@ -1,7 +1,8 @@
 import { ConversationService } from '@/application/conversation/service';
+import { RedisService } from '@/application/redis/service';
 import { Test } from '@nestjs/testing';
 import type { Socket } from 'socket.io';
-import { dummyConversation, dummyDate, dummyUser } from '~/dummies';
+import { dummyConversation, dummyDate, dummyIds, dummyUser } from '~/dummies';
 import { MockedSocket } from '~/socket.io';
 import { ConversationGateway } from '../gateway';
 
@@ -14,7 +15,11 @@ describe('Conversation leave event', () => {
     leave: jest.fn(),
   };
 
-  beforeAll(async () => {
+  const redisServiceMock = {
+    eraseConversation: jest.fn(),
+  };
+
+  beforeEach(async () => {
     socket = MockedSocket();
     const app = await Test.createTestingModule({
       providers: [
@@ -22,6 +27,10 @@ describe('Conversation leave event', () => {
         {
           provide: ConversationService,
           useValue: conversationServiceMock,
+        },
+        {
+          provide: RedisService,
+          useValue: redisServiceMock,
         },
       ],
     }).compile();
@@ -45,5 +54,40 @@ describe('Conversation leave event', () => {
       conversationId: dummyConversation.id,
       user: dummyUser,
     });
+  });
+
+  it('should ask redisService to erase conversation if there is no one left', () => {
+    conversationGateway.handleLeave(
+      {
+        data: {
+          user: dummyUser,
+          conversationId: dummyConversation.id,
+        },
+        timestamp: dummyDate,
+      },
+      socket,
+    );
+
+    expect(redisServiceMock.eraseConversation).toHaveBeenCalledWith(
+      dummyConversation.id,
+    );
+  });
+
+  it("shouldn't ask redisService to erase conversation if there is someone left", () => {
+    socket.join(dummyIds[0] as string);
+    socket.join(dummyIds[1] as string);
+
+    conversationGateway.handleLeave(
+      {
+        data: {
+          user: dummyUser,
+          conversationId: dummyConversation.id,
+        },
+        timestamp: dummyDate,
+      },
+      socket,
+    );
+
+    expect(redisServiceMock.eraseConversation).not.toHaveBeenCalled();
   });
 });

@@ -1,4 +1,5 @@
 import { ConversationService } from '@/application/conversation/service';
+import { RedisService } from '@/application/redis/service';
 import { Test } from '@nestjs/testing';
 import type { Socket } from 'socket.io';
 import { dummyDate, dummyMessage } from '~/dummies';
@@ -8,10 +9,15 @@ import { ConversationGateway } from '../gateway';
 describe('Conversation message event', () => {
   let socket: Socket;
   let conversationGateway: ConversationGateway;
-  let service: ConversationService;
+  let conversationService: ConversationService;
+  let redisService: RedisService;
 
   const conversationServiceMock = {
     sendMessage: jest.fn(),
+  };
+
+  const redisServiceMock = {
+    appendMessage: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -23,13 +29,18 @@ describe('Conversation message event', () => {
           provide: ConversationService,
           useValue: conversationServiceMock,
         },
+        {
+          provide: RedisService,
+          useValue: redisServiceMock,
+        },
       ],
     }).compile();
     conversationGateway = app.get<ConversationGateway>(ConversationGateway);
-    service = app.get<ConversationService>(ConversationService);
+    conversationService = app.get<ConversationService>(ConversationService);
+    redisService = app.get<RedisService>(RedisService);
   });
 
-  it('should call conversation send message service if conversation is found', () => {
+  it('should call conversation send message conversationService if conversation is found', () => {
     socket.join(dummyMessage.conversationId);
 
     conversationGateway.handleMessage(
@@ -40,10 +51,13 @@ describe('Conversation message event', () => {
       socket,
     );
 
-    expect(service.sendMessage).toHaveBeenCalledWith(socket, dummyMessage);
+    expect(conversationService.sendMessage).toHaveBeenCalledWith(
+      socket,
+      dummyMessage,
+    );
   });
 
-  it('should not call conversation send message service if conversation is not found', () => {
+  it('should not call conversation send message conversationService if conversation is not found', () => {
     conversationGateway.handleMessage(
       {
         data: dummyMessage,
@@ -52,6 +66,20 @@ describe('Conversation message event', () => {
       socket,
     );
 
-    expect(service.sendMessage).not.toHaveBeenCalled();
+    expect(conversationService.sendMessage).not.toHaveBeenCalled();
+  });
+
+  it('should ask to redisService to save message', () => {
+    socket.join(dummyMessage.conversationId);
+
+    conversationGateway.handleMessage(
+      {
+        data: dummyMessage,
+        timestamp: dummyDate,
+      },
+      socket,
+    );
+
+    expect(redisService.appendMessage).toHaveBeenCalledWith(dummyMessage);
   });
 });

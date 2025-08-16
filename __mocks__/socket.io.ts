@@ -7,7 +7,9 @@ export class MockedSocket1 implements Partial<Socket> {
   public join = jest.fn((room) => {
     this.rooms.add(room);
   });
-  public leave = jest.fn();
+  public leave = jest.fn((room) => {
+    this.rooms.delete(room);
+  });
   public disconnect = jest.fn();
   public rooms = new Set<string>();
 }

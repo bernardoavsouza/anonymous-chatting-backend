@@ -1,4 +1,5 @@
 import { ConversationService } from '@/application/conversation/service';
+import { RedisService } from '@/application/redis/service';
 import { Test } from '@nestjs/testing';
 import type { Socket } from 'socket.io';
 import { dummyConversation, dummyDate, dummyUser } from '~/dummies';
@@ -14,7 +15,11 @@ describe('Conversation join event', () => {
     join: jest.fn(),
   };
 
-  beforeAll(async () => {
+  const redisServiceMock = {
+    appendMessage: jest.fn(),
+  };
+
+  beforeEach(async () => {
     socket = MockedSocket();
     const app = await Test.createTestingModule({
       providers: [
@@ -22,6 +27,10 @@ describe('Conversation join event', () => {
         {
           provide: ConversationService,
           useValue: conversationServiceMock,
+        },
+        {
+          provide: RedisService,
+          useValue: redisServiceMock,
         },
       ],
     }).compile();

@@ -2,7 +2,7 @@ import type { Conversation } from '@/core/conversation.interface';
 import type { Message } from '@/core/message.interface';
 import type { User } from '@/core/user.interface';
 
-const dummyIds = [
+export const dummyIds = [
   'a3bb189e-8bf9-4d3f-9e3b-4e2c6f1a1b2c',
   '7c9e6679-7425-40de-944b-e07fc1f90ae7',
 ];
