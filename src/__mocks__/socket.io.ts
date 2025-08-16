@@ -24,7 +24,8 @@ const dummyIds = [
   '7c9e6679-7425-40de-944b-e07fc1f90ae7',
 ];
 
-export const dummyDate = new Date('2025-07-08T14:24:35.407Z');
+export const dummyTimestamp = '2025-07-08T14:24:35.407Z';
+export const dummyDate = new Date(dummyTimestamp);
 
 export const dummyMessage: Message = {
   content: 'dummy message',

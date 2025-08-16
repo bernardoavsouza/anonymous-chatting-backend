@@ -13,6 +13,7 @@ const config: Config = {
   preset: 'ts-jest',
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
+    '^~/(.*)$': '<rootDir>/__mocks__/$1',
   },
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
 };

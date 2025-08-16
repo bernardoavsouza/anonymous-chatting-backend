@@ -31,7 +31,8 @@
     "allowUnreachableCode": true,
     "skipLibCheck": true,
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "~/*": ["./__mocks__/*"]
     }
   }
 }
