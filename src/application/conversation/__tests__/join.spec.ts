@@ -18,7 +18,7 @@ describe('Conversation join service', () => {
   it('should join room on conversation join event', () => {
     service.join(socket, {
       conversationId: dummyConversation.id,
-      user: dummyUser,
+      userId: dummyUser.id,
     });
 
     expect(socket.join).toHaveBeenCalledWith(dummyConversation.id);
@@ -27,14 +27,14 @@ describe('Conversation join service', () => {
   it('should emit conversation join event to the same conversation', () => {
     service.join(socket, {
       conversationId: dummyConversation.id,
-      user: dummyUser,
+      userId: dummyUser.id,
     });
 
     expect(socket.to).toHaveBeenCalledWith(dummyConversation.id);
     expect(socket.emit).toHaveBeenCalledWith(ConversationEvent.JOIN, {
       data: {
         conversationId: dummyConversation.id,
-        user: dummyUser,
+        userId: dummyUser.id,
       },
       timestamp: expect.any(Date),
     } satisfies InputPort<ConversationJoinInputDTO>);

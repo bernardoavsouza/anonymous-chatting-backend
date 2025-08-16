@@ -4,12 +4,12 @@ import type { User } from '@/core/user.interface';
 
 export class ConversationJoinServiceDTO {
   conversationId: Conversation['id'];
-  user: User;
+  userId: User['id'];
 }
 
 export class ConversationMessageServiceDTO extends Message {}
 
 export class ConversationLeaveServiceDTO {
   conversationId: Conversation['id'];
-  user: User;
+  userId: User['id'];
 }

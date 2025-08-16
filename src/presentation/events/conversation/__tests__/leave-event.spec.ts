@@ -42,7 +42,7 @@ describe('Conversation leave event', () => {
     conversationGateway.handleLeave(
       {
         data: {
-          user: dummyUser,
+          userId: dummyUser.id,
           conversationId: dummyConversation.id,
         },
         timestamp: dummyDate,
@@ -52,7 +52,7 @@ describe('Conversation leave event', () => {
 
     expect(service.leave).toHaveBeenCalledWith(socket, {
       conversationId: dummyConversation.id,
-      user: dummyUser,
+      userId: dummyUser.id,
     });
   });
 
@@ -60,7 +60,7 @@ describe('Conversation leave event', () => {
     conversationGateway.handleLeave(
       {
         data: {
-          user: dummyUser,
+          userId: dummyUser.id,
           conversationId: dummyConversation.id,
         },
         timestamp: dummyDate,
@@ -80,7 +80,7 @@ describe('Conversation leave event', () => {
     conversationGateway.handleLeave(
       {
         data: {
-          user: dummyUser,
+          userId: dummyUser.id,
           conversationId: dummyConversation.id,
         },
         timestamp: dummyDate,

@@ -42,7 +42,7 @@ describe('Conversation join event', () => {
     conversationGateway.handleJoin(
       {
         data: {
-          user: dummyUser,
+          userId: dummyUser.id,
           conversationId: dummyConversation.id,
         },
         timestamp: dummyDate,
@@ -52,7 +52,7 @@ describe('Conversation join event', () => {
 
     expect(service.join).toHaveBeenCalledWith(socket, {
       conversationId: dummyConversation.id,
-      user: dummyUser,
+      userId: dummyUser.id,
     });
   });
 });

@@ -16,7 +16,7 @@ describe('Conversation leave service', () => {
   it('should leave room on conversation leave event', () => {
     service.leave(socket, {
       conversationId: dummyConversation.id,
-      user: dummyUser,
+      userId: dummyUser.id,
     });
 
     expect(socket.leave).toHaveBeenCalledWith(dummyConversation.id);
@@ -25,7 +25,7 @@ describe('Conversation leave service', () => {
   it('should emit conversation leave event to the same conversation', () => {
     service.leave(socket, {
       conversationId: dummyConversation.id,
-      user: dummyUser,
+      userId: dummyUser.id,
     });
 
     expect(socket.to).toHaveBeenCalledWith(dummyConversation.id);
@@ -34,7 +34,7 @@ describe('Conversation leave service', () => {
       {
         data: {
           conversationId: dummyConversation.id,
-          user: dummyUser,
+          userId: dummyUser.id,
         },
         timestamp: expect.any(Date),
       },
