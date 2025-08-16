@@ -5,15 +5,10 @@ import Redis from 'ioredis';
 
 @Injectable()
 export class RedisService {
-  private readonly client: Redis;
+  readonly client: Redis;
 
   constructor(private readonly config: ConfigService) {
-    this.client = new Redis({
-      host: this.config.getOrThrow('redis.host'),
-      port: this.config.getOrThrow('redis.port'),
-      username: this.config.getOrThrow('redis.username'),
-      password: this.config.getOrThrow('redis.password'),
-    });
+    this.client = new Redis(this.config.getOrThrow('redis.url'));
   }
 
   appendMessage(message: Message): void {
@@ -25,5 +20,9 @@ export class RedisService {
         timestamp: new Date(),
       }),
     );
+  }
+
+  eraseConversation(conversationId: string): void {
+    this.client.del(conversationId);
   }
 }
