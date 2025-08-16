@@ -1,12 +1,9 @@
-import {
-  dummyConversation,
-  dummyUser,
-  MockedSocket,
-} from '@/__mocks__/socket.io';
 import type { ConversationJoinInputDTO } from '@/presentation/events/conversation/dto';
 import { ConversationEvent } from '@/presentation/events/conversation/types';
 import type { InputPort } from '@/presentation/ports';
 import type { Socket } from 'socket.io';
+import { dummyConversation, dummyUser } from '~/dummies';
+import { MockedSocket } from '~/socket.io';
 import { ConversationService } from '../service';
 
 describe('Conversation join service', () => {

@@ -1,7 +1,8 @@
-import { MockedSocket, dummyDate, dummyMessage } from '@/__mocks__/socket.io';
 import { ConversationService } from '@/application/conversation/service';
 import { Test } from '@nestjs/testing';
 import type { Socket } from 'socket.io';
+import { dummyDate, dummyMessage } from '~/dummies';
+import { MockedSocket } from '~/socket.io';
 import { ConversationGateway } from '../gateway';
 
 describe('Conversation message event', () => {

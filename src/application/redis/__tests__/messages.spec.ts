@@ -1,6 +1,6 @@
-import { dummyDate, dummyMessage } from '@/__mocks__/socket.io';
 import { ConfigService } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
+import { dummyDate, dummyMessage } from '~/dummies';
 import { mockDate } from '~/globals/date';
 import { RedisService } from '../service';
 

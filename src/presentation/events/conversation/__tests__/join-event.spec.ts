@@ -1,12 +1,8 @@
-import {
-  dummyConversation,
-  dummyDate,
-  dummyUser,
-  MockedSocket,
-} from '@/__mocks__/socket.io';
 import { ConversationService } from '@/application/conversation/service';
 import { Test } from '@nestjs/testing';
 import type { Socket } from 'socket.io';
+import { dummyConversation, dummyDate, dummyUser } from '~/dummies';
+import { MockedSocket } from '~/socket.io';
 import { ConversationGateway } from '../gateway';
 
 describe('Conversation join event', () => {

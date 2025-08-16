@@ -1,4 +1,3 @@
-import { dummyDate } from '@/__mocks__/socket.io';
 import { Message } from '@/core/message.interface';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -23,7 +22,7 @@ export class RedisService {
       JSON.stringify({
         message: message.content,
         userId: message.senderId,
-        timestamp: dummyDate,
+        timestamp: new Date(),
       }),
     );
   }

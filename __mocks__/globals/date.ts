@@ -1,4 +1,4 @@
-import { dummyTimestamp } from '@/__mocks__/socket.io';
+import { dummyTimestamp } from '~/dummies';
 
 export const mockDate = (): void => {
   const OriginalDate = global.Date;
