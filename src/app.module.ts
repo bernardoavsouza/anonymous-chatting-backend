@@ -1,5 +1,4 @@
 import { AppController } from '@/app.controller';
-import { AppService } from '@/app.service';
 import { EventsModule } from '@/presentation/events/module';
 import { ClassSerializerInterceptor, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
@@ -19,7 +18,6 @@ import configs from './config';
   ],
   controllers: [AppController],
   providers: [
-    AppService,
     {
       provide: APP_INTERCEPTOR,
       useClass: ClassSerializerInterceptor,
