@@ -73,4 +73,4 @@ jobs:
           cpu: 1
           memory: 2
           port: ${{ secrets.PORT }}
-          wait-for-service-stability-seconds: 120
+          wait-for-service-stability-seconds: 1200
