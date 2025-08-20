@@ -70,7 +70,8 @@ jobs:
           image: ${{env.ECR_REGISTRY}}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
           access-role-arn: ${{ secrets.ROLE_ARN }}
           region: ${{ secrets.AWS_REGION }}
-          cpu: 1
-          memory: 2
+          cpu: 0.25
+          memory: 0.5
+          auto-scaling-config-arn: ${{ secrets.AUTO_SCALING_CONFIG_ARN }}
           port: ${{ secrets.PORT }}
           wait-for-service-stability-seconds: 1200
