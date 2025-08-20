@@ -40,6 +40,9 @@ importers:
       rxjs:
         specifier: ^7.8.1
         version: 7.8.2
+      socket.io:
+        specifier: ^4.8.1
+        version: 4.8.1
     devDependencies:
       '@commitlint/cli':
         specifier: ^19.8.1
@@ -68,9 +71,6 @@ importers:
       '@swc/core':
         specifier: ^1.10.7
         version: 1.12.9
-      '@types/ioredis':
-        specifier: ^5.0.0
-        version: 5.0.0
       '@types/jest':
         specifier: ^29.5.14
         version: 29.5.14
@@ -113,9 +113,6 @@ importers:
       prettier-plugin-organize-imports:
         specifier: ^4.1.0
         version: 4.1.0(prettier@3.6.2)(typescript@5.8.3)
-      socket.io:
-        specifier: ^4.8.1
-        version: 4.8.1
       source-map-support:
         specifier: ^0.5.21
         version: 0.5.21
@@ -1769,13 +1766,6 @@ packages:
       {
         integrity: sha512-1m0bIFVc7eJWyve9S0RnuRgcQqF/Xd5QsUZAZeQFr1Q3/p9JWoQQEqmVy+DPTNpGXwhgIetAoYF8JSc33q29QA==,
       }
-
-  '@types/ioredis@5.0.0':
-    resolution:
-      {
-        integrity: sha512-zJbJ3FVE17CNl5KXzdeSPtdltc4tMT3TzC6fxQS0sQngkbFZ6h+0uTafsRqu+eSLIugf6Yb0Ea0SUuRr42Nk9g==,
-      }
-    deprecated: This is a stub types definition. ioredis provides its own type definitions, so you do not need this installed.
 
   '@types/istanbul-lib-coverage@2.0.6':
     resolution:
@@ -7987,12 +7977,6 @@ snapshots:
       '@types/node': 22.16.0
 
   '@types/http-cache-semantics@4.0.4': {}
-
-  '@types/ioredis@5.0.0':
-    dependencies:
-      ioredis: 5.7.0
-    transitivePeerDependencies:
-      - supports-color
 
   '@types/istanbul-lib-coverage@2.0.6': {}
 
