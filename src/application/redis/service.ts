@@ -11,8 +11,8 @@ export class RedisService {
     this.client = new Redis(this.config.getOrThrow('redis.url'));
   }
 
-  appendMessage(message: Message): void {
-    this.client.rpush(
+  async appendMessage(message: Message): Promise<void> {
+    await this.client.rpush(
       message.conversationId,
       JSON.stringify({
         message: message.content,
@@ -22,7 +22,7 @@ export class RedisService {
     );
   }
 
-  eraseConversation(conversationId: string): void {
-    this.client.del(conversationId);
+  async eraseConversation(conversationId: string): Promise<void> {
+    await this.client.del(conversationId);
   }
 }

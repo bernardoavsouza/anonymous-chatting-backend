@@ -32,28 +32,28 @@ export class ConversationGateway {
   }
 
   @SubscribeMessage(ConversationEvent.MESSAGE)
-  handleMessage(
+  async handleMessage(
     @MessageBody()
     input: InputPort<ConversationMessageInputDTO>,
 
     @ConnectedSocket() client: Socket,
-  ): void {
+  ): Promise<void> {
     if (!client.rooms.has(input.data.conversationId)) return;
 
     this.conversationService.sendMessage(client, input.data);
-    this.redisService.appendMessage(input.data);
+    await this.redisService.appendMessage(input.data);
   }
 
   @SubscribeMessage(ConversationEvent.LEAVE)
-  handleLeave(
+  async handleLeave(
     @MessageBody()
     input: InputPort<ConversationLeaveInputDTO>,
     @ConnectedSocket() client: Socket,
-  ): void {
+  ): Promise<void> {
     this.conversationService.leave(client, input.data);
 
     if (!client.rooms.has(input.data.conversationId)) {
-      this.redisService.eraseConversation(input.data.conversationId);
+      await this.redisService.eraseConversation(input.data.conversationId);
     }
   }
 }
