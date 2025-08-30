@@ -8,8 +8,7 @@ on:
     branches:
       - production
 env:
-  ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-  IMAGE_TAG: ${{ github.sha }}
+  IMAGE_NAME: 'anonymous-chatting'
 
 jobs:
   build:
@@ -22,24 +21,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v5
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Build, tag, and push image to Amazon ECR
-        id: build-image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+      - name: Configure Docker for Artifact Registry
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev --quiet
+
+      - name: Build, tag, and push image to Artifact Registry
+        id: build-and-push-image
+        run: |
+          docker build -t ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.ARTIFACT_REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:latest .
+          docker push ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.ARTIFACT_REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:latest
 
   deploy:
     name: Deploy
@@ -50,28 +45,24 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v5
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Deploy to App Runner
-        uses: awslabs/amazon-app-runner-deploy@main
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+      - id: 'deploy'
+        uses: 'google-github-actions/deploy-cloudrun@v2'
         with:
-          service: anonymous-chatting
-          image: ${{env.ECR_REGISTRY}}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
-          access-role-arn: ${{ secrets.ROLE_ARN }}
-          region: ${{ secrets.AWS_REGION }}
-          cpu: 0.25
-          memory: 0.5
-          auto-scaling-config-arn: ${{ secrets.AUTO_SCALING_CONFIG_ARN }}
-          port: ${{ secrets.PORT }}
-          wait-for-service-stability-seconds: 1200
+          service: ${{ env.IMAGE_NAME }}
+          image: '${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.ARTIFACT_REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:latest'
+          flags: |
+            --port ${{ secrets.APP_PORT }}
+            --allow-unauthenticated
+            --min 0
+            --max-instances 1
+          env_vars: |
+            APP_PORT=${{ secrets.APP_PORT }}
+            REDIS_HOST=${{ secrets.REDIS_HOST }}
+            REDIS_PORT=${{ secrets.REDIS_PORT }}
+            REDIS_USERNAME=${{ secrets.REDIS_USERNAME }}
+            REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
