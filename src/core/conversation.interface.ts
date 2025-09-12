@@ -1,5 +1,6 @@
 import { Transform } from 'class-transformer';
-import { IsDate, IsUUID } from 'class-validator';
+import { IsDate, IsUUID, ValidateNested } from 'class-validator';
+import { User } from './user.interface';
 
 export class Conversation {
   @IsUUID()
@@ -8,4 +9,7 @@ export class Conversation {
   @IsDate()
   @Transform(({ value }) => new Date(value))
   createdAt: Date;
+
+  @ValidateNested()
+  users: User['id'][];
 }

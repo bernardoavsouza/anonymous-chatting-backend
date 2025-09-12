@@ -4,7 +4,7 @@ import { dummyConversation, dummyMessage } from '~/dummies';
 import { mockDate } from '~/globals/date';
 import { RedisService } from '../service';
 
-describe('Redis messages service', () => {
+describe('Redis leave service', () => {
   let redisService: RedisService;
 
   beforeEach(async () => {
@@ -24,7 +24,7 @@ describe('Redis messages service', () => {
     mockDate();
   });
 
-  it('should be able to append new messages', async () => {
+  it('should be able to erase conversation records', async () => {
     redisService.eraseConversation(dummyConversation.id);
 
     expect(redisService.client.del).toHaveBeenCalledWith(

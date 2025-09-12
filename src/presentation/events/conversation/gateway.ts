@@ -29,6 +29,10 @@ export class ConversationGateway {
     @ConnectedSocket() client: Socket,
   ): void {
     this.conversationService.join(client, input.data);
+    this.redisService.appendDetails({
+      conversationId: input.data.conversationId,
+      userId: input.data.userId,
+    });
   }
 
   @SubscribeMessage(ConversationEvent.MESSAGE)
