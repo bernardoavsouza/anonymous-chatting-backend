@@ -1,6 +1,12 @@
 import { ConfigService } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
-import { dummyDate, dummyMessage } from '~/dummies';
+import {
+  dummyConversation,
+  dummyDate,
+  dummyIds,
+  dummyMessage,
+  dummyUser,
+} from '~/dummies';
 import { mockDate } from '~/globals/date';
 import { RedisService } from '../service';
 
@@ -25,10 +31,9 @@ describe('Redis messages service', () => {
   });
 
   it('should be able to append new messages', async () => {
-    redisService.appendMessage(dummyMessage);
+    await redisService.appendMessage(dummyMessage);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect((redisService as any).client.rpush).toHaveBeenCalledWith(
+    expect(redisService.client.rpush).toHaveBeenCalledWith(
       dummyMessage.conversationId,
       JSON.stringify({
         message: dummyMessage.content,
@@ -36,5 +41,44 @@ describe('Redis messages service', () => {
         timestamp: dummyDate,
       }),
     );
+  });
+
+  it('should be able to create conversation details', async () => {
+    await redisService.upsertDetails({
+      conversationId: dummyConversation.id,
+      userId: dummyUser.id,
+    });
+
+    expect(redisService.client.set).toHaveBeenCalledWith(
+      `details-${dummyConversation.id}`,
+      JSON.stringify({
+        conversationId: dummyConversation.id,
+        users: [dummyUser.id],
+        createdAt: dummyDate,
+      }),
+    );
+  });
+
+  it('should be able to add new users to conversation details', async () => {
+    await redisService.upsertDetails({
+      conversationId: dummyConversation.id,
+      userId: dummyIds[0] as string,
+    });
+
+    await redisService.upsertDetails({
+      conversationId: dummyConversation.id,
+      userId: dummyIds[1] as string,
+    });
+
+    const redisSetter = redisService.client.set as jest.Mock;
+
+    expect(redisSetter.mock.calls.pop()).toEqual([
+      `details-${dummyConversation.id}`,
+      JSON.stringify({
+        conversationId: dummyConversation.id,
+        users: [dummyIds[0], dummyIds[1]],
+        createdAt: dummyDate,
+      }),
+    ]);
   });
 });
