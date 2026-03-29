@@ -1,5 +1,5 @@
-import { ConversationService } from '@/application/conversation/service';
-import { RedisModule } from '@/application/redis/module';
+import { RedisModule } from '@/datasource/redis/module';
+import { ConversationService } from '@/domain/conversation/service';
 import { Module } from '@nestjs/common';
 import { ConversationGateway } from './conversation/gateway';
 
@@ -7,4 +7,4 @@ import { ConversationGateway } from './conversation/gateway';
   imports: [RedisModule],
   providers: [ConversationGateway, ConversationService],
 })
-export class EventsModule {}
+export class GatewaysModule {}

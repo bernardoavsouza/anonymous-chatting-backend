@@ -1,6 +1,6 @@
 import { Transform } from 'class-transformer';
-import { IsDate, IsUUID, ValidateNested } from 'class-validator';
-import { User } from './user.interface';
+import { IsDate, IsString, IsUUID, ValidateNested } from 'class-validator';
+import { User } from '../user.interface';
 
 export class Conversation {
   @IsUUID()
@@ -24,4 +24,15 @@ export class ConversationDetails {
   @IsDate()
   @Transform(({ value }) => new Date(value))
   createdAt: Date;
+}
+
+export class Message {
+  @IsString()
+  content: string;
+
+  @IsUUID()
+  conversationId: Conversation['id'];
+
+  @IsUUID()
+  senderId: User['id'];
 }

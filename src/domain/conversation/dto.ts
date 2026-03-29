@@ -1,6 +1,6 @@
-import type { Conversation } from '@/core/conversation.interface';
-import { Message } from '@/core/message.interface';
-import type { User } from '@/core/user.interface';
+import type { Conversation } from '@/domain/conversation/interfaces';
+import { Message } from '@/domain/conversation/interfaces';
+import type { User } from '@/domain/user.interface';
 
 export class ConversationJoinServiceDTO {
   conversationId: Conversation['id'];

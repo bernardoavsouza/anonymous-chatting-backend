@@ -1,5 +1,5 @@
-import { ConversationService } from '@/application/conversation/service';
-import { RedisService } from '@/application/redis/service';
+import { RedisDatasource } from '@/datasource/redis/datasource';
+import { ConversationService } from '@/domain/conversation/service';
 import { Test } from '@nestjs/testing';
 import type { Socket } from 'socket.io';
 import { dummyDate, dummyMessage } from '~/dummies';
@@ -10,7 +10,7 @@ describe('Conversation message event', () => {
   let socket: Socket;
   let conversationGateway: ConversationGateway;
   let conversationService: ConversationService;
-  let redisService: RedisService;
+  let redisService: RedisDatasource;
 
   const conversationServiceMock = {
     sendMessage: jest.fn(),
@@ -30,14 +30,14 @@ describe('Conversation message event', () => {
           useValue: conversationServiceMock,
         },
         {
-          provide: RedisService,
+          provide: RedisDatasource,
           useValue: redisServiceMock,
         },
       ],
     }).compile();
     conversationGateway = app.get<ConversationGateway>(ConversationGateway);
     conversationService = app.get<ConversationService>(ConversationService);
-    redisService = app.get<RedisService>(RedisService);
+    redisService = app.get<RedisDatasource>(RedisDatasource);
   });
 
   it('should call conversation send message conversationService if conversation is found', () => {

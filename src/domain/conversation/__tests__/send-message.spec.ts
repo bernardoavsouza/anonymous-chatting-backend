@@ -1,4 +1,4 @@
-import { ConversationEvent } from '@/presentation/events/conversation/types';
+import { ConversationEvent } from '@/transport/conversation/types';
 import type { Socket } from 'socket.io';
 import { dummyMessage } from '~/dummies';
 import { MockedSocket } from '~/socket.io';

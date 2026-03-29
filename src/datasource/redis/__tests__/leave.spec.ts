@@ -2,15 +2,15 @@ import { ConfigService } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
 import { dummyConversation, dummyMessage } from '~/dummies';
 import { mockDate } from '~/globals/date';
-import { RedisService } from '../service';
+import { RedisDatasource } from '../datasource';
 
 describe('Redis leave service', () => {
-  let redisService: RedisService;
+  let redisService: RedisDatasource;
 
   beforeEach(async () => {
     const app = await Test.createTestingModule({
       providers: [
-        RedisService,
+        RedisDatasource,
         {
           provide: ConfigService,
           useValue: {
@@ -20,7 +20,7 @@ describe('Redis leave service', () => {
       ],
     }).compile();
 
-    redisService = app.get<RedisService>(RedisService);
+    redisService = app.get<RedisDatasource>(RedisDatasource);
     mockDate();
   });
 

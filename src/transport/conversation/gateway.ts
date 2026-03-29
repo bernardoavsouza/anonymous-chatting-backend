@@ -1,7 +1,7 @@
-import { ConversationService } from '@/application/conversation/service';
-import { RedisService } from '@/application/redis/service';
-import { BaseWebSocketGateway } from '@/presentation/decorators/ws-gateway';
-import { InputPort } from '@/presentation/ports';
+import { RedisDatasource } from '@/datasource/redis/datasource';
+import { ConversationService } from '@/domain/conversation/service';
+import { BaseWebSocketGateway } from '@/transport/decorators/ws-gateway';
+import { InputPort } from '@/transport/ports';
 import {
   ConnectedSocket,
   MessageBody,
@@ -19,7 +19,7 @@ import { ConversationEvent } from './types';
 export class ConversationGateway {
   constructor(
     private readonly conversationService: ConversationService,
-    private readonly redisService: RedisService,
+    private readonly redisService: RedisDatasource,
   ) {}
 
   @SubscribeMessage(ConversationEvent.JOIN)

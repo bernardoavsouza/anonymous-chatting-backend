@@ -1,15 +1,15 @@
 import {
   Conversation,
   ConversationDetails,
-} from '@/core/conversation.interface';
-import { Message } from '@/core/message.interface';
-import { User } from '@/core/user.interface';
+  Message,
+} from '@/domain/conversation/interfaces';
+import { User } from '@/domain/user.interface';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
 
 @Injectable()
-export class RedisService {
+export class RedisDatasource {
   readonly client: Redis;
 
   constructor(private readonly config: ConfigService) {

@@ -1,6 +1,6 @@
-import type { ConversationJoinInputDTO } from '@/presentation/events/conversation/dto';
-import { ConversationEvent } from '@/presentation/events/conversation/types';
-import type { InputPort } from '@/presentation/ports';
+import type { ConversationJoinInputDTO } from '@/transport/conversation/dto';
+import { ConversationEvent } from '@/transport/conversation/types';
+import type { InputPort } from '@/transport/ports';
 import type { Socket } from 'socket.io';
 import { dummyConversation, dummyUser } from '~/dummies';
 import { MockedSocket } from '~/socket.io';

@@ -8,15 +8,15 @@ import {
   dummyUser,
 } from '~/dummies';
 import { mockDate } from '~/globals/date';
-import { RedisService } from '../service';
+import { RedisDatasource } from '../datasource';
 
 describe('Redis messages service', () => {
-  let redisService: RedisService;
+  let redisService: RedisDatasource;
 
   beforeEach(async () => {
     const app = await Test.createTestingModule({
       providers: [
-        RedisService,
+        RedisDatasource,
         {
           provide: ConfigService,
           useValue: {
@@ -26,7 +26,7 @@ describe('Redis messages service', () => {
       ],
     }).compile();
 
-    redisService = app.get<RedisService>(RedisService);
+    redisService = app.get<RedisDatasource>(RedisDatasource);
     mockDate();
   });
 

@@ -1,23 +1,29 @@
-import { ConversationService } from '@/application/conversation/service';
-import { RedisService } from '@/application/redis/service';
+import { RedisDatasource } from '@/datasource/redis/datasource';
+import { ConversationService } from '@/domain/conversation/service';
 import { Test } from '@nestjs/testing';
 import type { Socket } from 'socket.io';
-import { dummyConversation, dummyDate, dummyIds, dummyUser } from '~/dummies';
+import { dummyConversation, dummyDate, dummyUser } from '~/dummies';
+import { mockDate } from '~/globals/date';
 import { MockedSocket } from '~/socket.io';
 import { ConversationGateway } from '../gateway';
 
-describe('Conversation leave event', () => {
+describe('Conversation join event', () => {
   let socket: Socket;
   let conversationGateway: ConversationGateway;
   let service: ConversationService;
 
   const conversationServiceMock = {
-    leave: jest.fn(),
+    join: jest.fn(),
   };
 
   const redisServiceMock = {
-    eraseConversation: jest.fn(),
+    appendMessage: jest.fn().mockResolvedValue(undefined),
+    upsertDetails: jest.fn().mockResolvedValue(undefined),
   };
+
+  beforeAll(() => {
+    mockDate();
+  });
 
   beforeEach(async () => {
     socket = MockedSocket();
@@ -29,7 +35,7 @@ describe('Conversation leave event', () => {
           useValue: conversationServiceMock,
         },
         {
-          provide: RedisService,
+          provide: RedisDatasource,
           useValue: redisServiceMock,
         },
       ],
@@ -38,8 +44,8 @@ describe('Conversation leave event', () => {
     service = app.get<ConversationService>(ConversationService);
   });
 
-  it('should leave room on conversation leave event', () => {
-    conversationGateway.handleLeave(
+  it('should trigger join method of conversation service properly', async () => {
+    conversationGateway.handleJoin(
       {
         data: {
           userId: dummyUser.id,
@@ -50,14 +56,14 @@ describe('Conversation leave event', () => {
       socket,
     );
 
-    expect(service.leave).toHaveBeenCalledWith(socket, {
+    expect(service.join).toHaveBeenCalledWith(socket, {
       conversationId: dummyConversation.id,
       userId: dummyUser.id,
     });
   });
 
-  it('should ask redisService to erase conversation if there is no one left', () => {
-    conversationGateway.handleLeave(
+  it('should save conversation details in redis', async () => {
+    conversationGateway.handleJoin(
       {
         data: {
           userId: dummyUser.id,
@@ -68,26 +74,9 @@ describe('Conversation leave event', () => {
       socket,
     );
 
-    expect(redisServiceMock.eraseConversation).toHaveBeenCalledWith(
-      dummyConversation.id,
-    );
-  });
-
-  it("shouldn't ask redisService to erase conversation if there is someone left", () => {
-    socket.join(dummyIds[0] as string);
-    socket.join(dummyIds[1] as string);
-
-    conversationGateway.handleLeave(
-      {
-        data: {
-          userId: dummyUser.id,
-          conversationId: dummyConversation.id,
-        },
-        timestamp: dummyDate,
-      },
-      socket,
-    );
-
-    expect(redisServiceMock.eraseConversation).not.toHaveBeenCalled();
+    expect(redisServiceMock.upsertDetails).toHaveBeenCalledWith({
+      conversationId: dummyConversation.id,
+      userId: dummyUser.id,
+    });
   });
 });
