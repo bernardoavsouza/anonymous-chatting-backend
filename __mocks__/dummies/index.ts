@@ -23,5 +23,6 @@ export const dummyUser: User = {
 
 export const dummyConversation: Conversation = {
   id: dummyIds[0] as string,
+  users: dummyIds,
   createdAt: dummyDate,
 };
