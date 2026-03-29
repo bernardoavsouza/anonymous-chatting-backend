@@ -1,1 +1,1 @@
-pnpm run test && pnpm build
+pnpm run test && pnpm build && pnpm type-check
