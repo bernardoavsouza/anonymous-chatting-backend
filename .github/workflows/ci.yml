@@ -2,8 +2,8 @@ name: Continuous Integration
 
 on:
   push:
-    branches:
-      - production
+    tags:
+      - 'v*'
 
 jobs:
   ci-setup:
