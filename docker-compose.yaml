@@ -6,9 +6,12 @@ services:
       dockerfile: dockerfile.dev
     ports:
       - '3000:3000'
+      - '9229:9229'
     volumes:
       - .:/app
       - /app/node_modules
+    entrypoint: []
+    command: pnpm exec nest start --debug 0.0.0.0:9229 --watch
     depends_on:
       - redis
 
