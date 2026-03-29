@@ -5,8 +5,7 @@ on:
     workflows: 'Continuous Integration'
     types:
       - completed
-    branches:
-      - production
+
 env:
   IMAGE_NAME: 'anonymous-chatting'
 
