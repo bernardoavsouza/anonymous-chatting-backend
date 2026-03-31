@@ -16,6 +16,17 @@
       }
     },
     {
+      "name": "Docker Attach",
+      "type": "node",
+      "request": "attach",
+      "port": 9229,
+      "address": "localhost",
+      "localRoot": "${workspaceFolder}",
+      "remoteRoot": "/app",
+      "restart": true,
+      "sourceMaps": true
+    },
+    {
       "name": "Test",
       "type": "node",
       "request": "launch",
