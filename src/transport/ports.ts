@@ -1,11 +1,4 @@
-import { Transform } from 'class-transformer';
-import { IsDate, IsObject } from 'class-validator';
-
-export class InputPort<T> {
-  @IsObject()
+export interface InputPort<T> {
   data: T;
-
-  @IsDate()
-  @Transform(({ value }) => new Date(value))
   timestamp: Date;
 }

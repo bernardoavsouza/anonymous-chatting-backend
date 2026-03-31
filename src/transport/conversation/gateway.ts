@@ -1,12 +1,9 @@
 import { RedisDatasource } from '@/datasource/redis/datasource';
 import { ConversationService } from '@/domain/conversation/service';
+import { WsBody } from '@/transport/decorators/ws-body';
 import { BaseWebSocketGateway } from '@/transport/decorators/ws-gateway';
-import { InputPort } from '@/transport/ports';
-import {
-  ConnectedSocket,
-  MessageBody,
-  SubscribeMessage,
-} from '@nestjs/websockets';
+import type { InputPort } from '@/transport/ports';
+import { ConnectedSocket, SubscribeMessage } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
 import {
   ConversationJoinInputDTO,
@@ -24,7 +21,7 @@ export class ConversationGateway {
 
   @SubscribeMessage(ConversationEvent.JOIN)
   handleJoin(
-    @MessageBody()
+    @WsBody(ConversationJoinInputDTO)
     input: InputPort<ConversationJoinInputDTO>,
     @ConnectedSocket() client: Socket,
   ): void {
@@ -37,9 +34,8 @@ export class ConversationGateway {
 
   @SubscribeMessage(ConversationEvent.MESSAGE)
   async handleMessage(
-    @MessageBody()
+    @WsBody(ConversationMessageInputDTO)
     input: InputPort<ConversationMessageInputDTO>,
-
     @ConnectedSocket() client: Socket,
   ): Promise<void> {
     if (!client.rooms.has(input.data.conversationId)) return;
@@ -50,7 +46,7 @@ export class ConversationGateway {
 
   @SubscribeMessage(ConversationEvent.LEAVE)
   async handleLeave(
-    @MessageBody()
+    @WsBody(ConversationLeaveInputDTO)
     input: InputPort<ConversationLeaveInputDTO>,
     @ConnectedSocket() client: Socket,
   ): Promise<void> {
