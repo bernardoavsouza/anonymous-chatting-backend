@@ -14,6 +14,4 @@ export class MockedSocket1 implements Partial<Socket> {
   public rooms = new Set<string>();
 }
 
-export const MockedSocket = jest.fn(
-  () => new MockedSocket1(),
-) as unknown as jest.Mock<Socket>;
+export const MockedSocket = jest.fn(() => new MockedSocket1()) as unknown as jest.Mock<Socket>;

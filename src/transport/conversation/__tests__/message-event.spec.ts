@@ -51,10 +51,7 @@ describe('Conversation message event', () => {
       socket,
     );
 
-    expect(conversationService.sendMessage).toHaveBeenCalledWith(
-      socket,
-      dummyMessage,
-    );
+    expect(conversationService.sendMessage).toHaveBeenCalledWith(socket, dummyMessage);
   });
 
   it('should not call conversation send message conversationService if conversation is not found', () => {

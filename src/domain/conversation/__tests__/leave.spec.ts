@@ -29,15 +29,12 @@ describe('Conversation leave service', () => {
     });
 
     expect(socket.to).toHaveBeenCalledWith(dummyConversation.id);
-    expect(socket.to(dummyConversation.id).emit).toHaveBeenCalledWith(
-      ConversationEvent.LEAVE,
-      {
-        data: {
-          conversationId: dummyConversation.id,
-          userId: dummyUser.id,
-        },
-        timestamp: expect.any(Date),
+    expect(socket.to(dummyConversation.id).emit).toHaveBeenCalledWith(ConversationEvent.LEAVE, {
+      data: {
+        conversationId: dummyConversation.id,
+        userId: dummyUser.id,
       },
-    );
+      timestamp: expect.any(Date),
+    });
   });
 });

@@ -68,9 +68,7 @@ describe('Conversation leave event', () => {
       socket,
     );
 
-    expect(redisServiceMock.eraseConversation).toHaveBeenCalledWith(
-      dummyConversation.id,
-    );
+    expect(redisServiceMock.eraseConversation).toHaveBeenCalledWith(dummyConversation.id);
   });
 
   it("shouldn't ask redisService to erase conversation if there is someone left", () => {

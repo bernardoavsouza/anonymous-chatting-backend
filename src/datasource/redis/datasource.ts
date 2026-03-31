@@ -1,8 +1,4 @@
-import {
-  Conversation,
-  ConversationDetails,
-  Message,
-} from '@/domain/conversation/interfaces';
+import { Conversation, ConversationDetails, Message } from '@/domain/conversation/interfaces';
 import { User } from '@/domain/user.interface';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -27,9 +23,7 @@ export class RedisDatasource {
     );
   }
 
-  async getDetails(
-    conversationId: Conversation['id'],
-  ): Promise<ConversationDetails | null> {
+  async getDetails(conversationId: Conversation['id']): Promise<ConversationDetails | null> {
     const details = await this.client.get(`details-${conversationId}`);
     if (!details) {
       return null;
@@ -38,13 +32,7 @@ export class RedisDatasource {
     return JSON.parse(details);
   }
 
-  async upsertDetails({
-    conversationId,
-    userId,
-  }: {
-    conversationId: Conversation['id'];
-    userId: User['id'];
-  }): Promise<void> {
+  async upsertDetails({ conversationId, userId }: { conversationId: Conversation['id']; userId: User['id'] }): Promise<void> {
     const details = await this.getDetails(conversationId);
 
     if (!details) {

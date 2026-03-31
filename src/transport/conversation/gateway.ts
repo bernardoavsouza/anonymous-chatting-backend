@@ -5,11 +5,7 @@ import { BaseWebSocketGateway } from '@/transport/decorators/ws-gateway';
 import type { InputPort } from '@/transport/ports';
 import { ConnectedSocket, SubscribeMessage } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
-import {
-  ConversationJoinInputDTO,
-  ConversationLeaveInputDTO,
-  ConversationMessageInputDTO,
-} from './dto';
+import { ConversationJoinInputDTO, ConversationLeaveInputDTO, ConversationMessageInputDTO } from './dto';
 import { ConversationEvent } from './types';
 
 @BaseWebSocketGateway()
@@ -20,11 +16,7 @@ export class ConversationGateway {
   ) {}
 
   @SubscribeMessage(ConversationEvent.JOIN)
-  handleJoin(
-    @WsBody(ConversationJoinInputDTO)
-    input: InputPort<ConversationJoinInputDTO>,
-    @ConnectedSocket() client: Socket,
-  ): void {
+  handleJoin(@WsBody(ConversationJoinInputDTO) input: InputPort<ConversationJoinInputDTO>, @ConnectedSocket() client: Socket): void {
     this.conversationService.join(client, input.data);
     this.redisService.upsertDetails({
       conversationId: input.data.conversationId,
@@ -34,8 +26,7 @@ export class ConversationGateway {
 
   @SubscribeMessage(ConversationEvent.MESSAGE)
   async handleMessage(
-    @WsBody(ConversationMessageInputDTO)
-    input: InputPort<ConversationMessageInputDTO>,
+    @WsBody(ConversationMessageInputDTO) input: InputPort<ConversationMessageInputDTO>,
     @ConnectedSocket() client: Socket,
   ): Promise<void> {
     if (!client.rooms.has(input.data.conversationId)) return;
@@ -46,8 +37,7 @@ export class ConversationGateway {
 
   @SubscribeMessage(ConversationEvent.LEAVE)
   async handleLeave(
-    @WsBody(ConversationLeaveInputDTO)
-    input: InputPort<ConversationLeaveInputDTO>,
+    @WsBody(ConversationLeaveInputDTO) input: InputPort<ConversationLeaveInputDTO>,
     @ConnectedSocket() client: Socket,
   ): Promise<void> {
     this.conversationService.leave(client, input.data);

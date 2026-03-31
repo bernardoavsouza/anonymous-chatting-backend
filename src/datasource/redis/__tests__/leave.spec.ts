@@ -27,8 +27,6 @@ describe('Redis leave service', () => {
   it('should be able to erase conversation records', async () => {
     redisService.eraseConversation(dummyConversation.id);
 
-    expect(redisService.client.del).toHaveBeenCalledWith(
-      dummyMessage.conversationId,
-    );
+    expect(redisService.client.del).toHaveBeenCalledWith(dummyMessage.conversationId);
   });
 });

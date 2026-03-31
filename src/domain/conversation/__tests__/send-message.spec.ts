@@ -17,12 +17,9 @@ describe('Conversation message service', () => {
     service.sendMessage(socket, dummyMessage);
 
     expect(socket.to).toHaveBeenCalledWith(dummyMessage.conversationId);
-    expect(socket.to(dummyMessage.conversationId).emit).toHaveBeenCalledWith(
-      ConversationEvent.MESSAGE,
-      {
-        data: dummyMessage,
-        timestamp: expect.any(Date),
-      },
-    );
+    expect(socket.to(dummyMessage.conversationId).emit).toHaveBeenCalledWith(ConversationEvent.MESSAGE, {
+      data: dummyMessage,
+      timestamp: expect.any(Date),
+    });
   });
 });

@@ -1,12 +1,6 @@
 import { ConfigService } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
-import {
-  dummyConversation,
-  dummyDate,
-  dummyIds,
-  dummyMessage,
-  dummyUser,
-} from '~/dummies';
+import { dummyConversation, dummyDate, dummyIds, dummyMessage, dummyUser } from '~/dummies';
 import { mockDate } from '~/globals/date';
 import { RedisDatasource } from '../datasource';
 

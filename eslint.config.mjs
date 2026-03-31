@@ -58,6 +58,7 @@ export default tseslint.config(
         },
       ],
       '@typescript-eslint/explicit-function-return-type': 'error',
+      'prettier/prettier': ['error', { printWidth: 150 }],
       'unused-imports/no-unused-imports': 'error',
       'unused-imports/no-unused-vars': [
         'warn',
