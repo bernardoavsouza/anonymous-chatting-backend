@@ -1,4 +1,4 @@
-FROM node:22.16.0-alpine AS build
+FROM node:24.14.0-alpine AS build
 ENV NODE_ENV=development
 
 WORKDIR /app
@@ -13,7 +13,7 @@ RUN pnpm run build
 
 # ----------------------------------------------------------- #
 
-FROM node:22.16.0-alpine AS production
+FROM node:24.14.0-alpine AS production
 ENV NODE_ENV=production
 
 WORKDIR /app
