@@ -29,6 +29,7 @@
     "allowUnusedLabels": true,
     "allowUnreachableCode": true,
     "skipLibCheck": true,
+    "types": ["jest", "node"],
     "paths": {
       "@/*": ["./src/*"],
       "~/*": ["./__mocks__/*"]
