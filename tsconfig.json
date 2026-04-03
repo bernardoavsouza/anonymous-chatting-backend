@@ -9,7 +9,6 @@
     "target": "ES2023",
     "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": "./",
     "incremental": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
@@ -31,7 +30,7 @@
     "allowUnreachableCode": true,
     "skipLibCheck": true,
     "paths": {
-      "@/*": ["src/*"],
+      "@/*": ["./src/*"],
       "~/*": ["./__mocks__/*"]
     }
   }
