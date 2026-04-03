@@ -28,12 +28,9 @@
     },
     {
       "name": "Test",
-      "type": "node",
+      "type": "node-terminal",
       "request": "launch",
-      "runtimeExecutable": "${env:HOME}/.nvm/nvm-exec",
-      "runtimeArgs": ["pnpm", "test"],
-      "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen"
+      "command": "${env:HOME}/.nvm/nvm-exec pnpm test"
     },
     {
       "name": "Test Watch",
