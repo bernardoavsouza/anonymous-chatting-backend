@@ -1,5 +1,4 @@
 import { RedisDatasource } from '@/datasource/redis/datasource';
-import { ConnectConversationUseCase } from '@/domain/conversation/connect.usecase';
 import { ConversationService } from '@/domain/conversation/service';
 import { Test } from '@nestjs/testing';
 import type { Socket } from 'socket.io';
@@ -22,10 +21,6 @@ describe('Conversation join event', () => {
     upsertDetails: jest.fn().mockResolvedValue(undefined),
   };
 
-  const connectUseCaseMock = {
-    execute: jest.fn(),
-  };
-
   beforeAll(() => {
     mockDate();
   });
@@ -42,10 +37,6 @@ describe('Conversation join event', () => {
         {
           provide: RedisDatasource,
           useValue: redisServiceMock,
-        },
-        {
-          provide: ConnectConversationUseCase,
-          useValue: connectUseCaseMock,
         },
       ],
     }).compile();

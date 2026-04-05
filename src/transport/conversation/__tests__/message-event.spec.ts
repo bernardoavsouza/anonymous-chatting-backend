@@ -1,5 +1,4 @@
 import { RedisDatasource } from '@/datasource/redis/datasource';
-import { ConnectConversationUseCase } from '@/domain/conversation/connect.usecase';
 import { ConversationService } from '@/domain/conversation/service';
 import { Test } from '@nestjs/testing';
 import type { Socket } from 'socket.io';
@@ -21,10 +20,6 @@ describe('Conversation message event', () => {
     appendMessage: jest.fn(),
   };
 
-  const connectUseCaseMock = {
-    execute: jest.fn(),
-  };
-
   beforeEach(async () => {
     socket = MockedSocket();
     const app = await Test.createTestingModule({
@@ -37,10 +32,6 @@ describe('Conversation message event', () => {
         {
           provide: RedisDatasource,
           useValue: redisServiceMock,
-        },
-        {
-          provide: ConnectConversationUseCase,
-          useValue: connectUseCaseMock,
         },
       ],
     }).compile();

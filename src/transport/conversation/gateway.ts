@@ -1,27 +1,19 @@
 import { RedisDatasource } from '@/datasource/redis/datasource';
-import { ConnectConversationUseCase } from '@/domain/conversation/connect.usecase';
 import { ConversationService } from '@/domain/conversation/service';
 import { WsBody } from '@/transport/decorators/ws-body';
 import { BaseWebSocketGateway } from '@/transport/decorators/ws-gateway';
 import type { InputPort } from '@/transport/ports';
-import { ConnectedSocket, OnGatewayConnection, SubscribeMessage } from '@nestjs/websockets';
+import { ConnectedSocket, SubscribeMessage } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
 import { ConversationJoinInputDTO, ConversationLeaveInputDTO, ConversationMessageInputDTO } from './dto';
 import { ConversationEvent } from './types';
 
 @BaseWebSocketGateway()
-export class ConversationGateway implements OnGatewayConnection {
+export class ConversationGateway {
   constructor(
     private readonly conversationService: ConversationService,
     private readonly redisService: RedisDatasource,
-    private readonly connectConversationUseCase: ConnectConversationUseCase,
   ) {}
-
-  async handleConnection(client: Socket): Promise<void> {
-    const { nickname, conversationId } = client.handshake.auth;
-    await this.connectConversationUseCase.execute({ nickname, conversationId });
-    // client.emit('connected', result);
-  }
 
   @SubscribeMessage(ConversationEvent.JOIN)
   handleJoin(@WsBody(ConversationJoinInputDTO) input: InputPort<ConversationJoinInputDTO>, @ConnectedSocket() client: Socket): void {

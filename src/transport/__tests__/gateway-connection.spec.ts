@@ -1,30 +1,16 @@
-import { RedisDatasource } from '@/datasource/redis/datasource';
 import { ConnectConversationUseCase } from '@/domain/conversation/connect.usecase';
-import { ConversationService } from '@/domain/conversation/service';
 import { Test } from '@nestjs/testing';
 import type { Socket } from 'socket.io';
 import { dummyConversation, dummyUsers } from '~/dummies';
 import { MockedSocket } from '~/socket.io';
-import { ConversationGateway } from '../gateway';
+import { AppGateway } from '../app.gateway';
 
-describe('Conversation connect event (handleConnection)', () => {
+describe('AppGateway (handleConnection)', () => {
   let socket: Socket;
-  let gateway: ConversationGateway;
+  let gateway: AppGateway;
 
   const connectUseCaseMock = {
     execute: jest.fn(),
-  };
-
-  const conversationServiceMock = {
-    join: jest.fn(),
-    leave: jest.fn(),
-    sendMessage: jest.fn(),
-  };
-
-  const redisServiceMock = {
-    upsertDetails: jest.fn(),
-    appendMessage: jest.fn(),
-    eraseConversation: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -32,15 +18,10 @@ describe('Conversation connect event (handleConnection)', () => {
     socket = MockedSocket();
 
     const app = await Test.createTestingModule({
-      providers: [
-        ConversationGateway,
-        { provide: ConnectConversationUseCase, useValue: connectUseCaseMock },
-        { provide: ConversationService, useValue: conversationServiceMock },
-        { provide: RedisDatasource, useValue: redisServiceMock },
-      ],
+      providers: [AppGateway, { provide: ConnectConversationUseCase, useValue: connectUseCaseMock }],
     }).compile();
 
-    gateway = app.get(ConversationGateway);
+    gateway = app.get(AppGateway);
   });
 
   it('should call the use case with nickname and no conversationId when not provided', async () => {
