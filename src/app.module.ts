@@ -1,6 +1,6 @@
 import { AppController } from '@/app.controller';
-import { RedisModule } from '@/datasource/redis/module';
-import { GatewaysModule } from '@/transport/module';
+import { DatasourceModule } from '@/datasource/module';
+import { TransportModule } from '@/transport/module';
 import { ClassSerializerInterceptor, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_INTERCEPTOR } from '@nestjs/core';
@@ -12,8 +12,8 @@ import configs from './config/redis';
       isGlobal: true,
       load: [configs],
     }),
-    GatewaysModule,
-    RedisModule,
+    TransportModule,
+    DatasourceModule,
   ],
   controllers: [AppController],
   providers: [

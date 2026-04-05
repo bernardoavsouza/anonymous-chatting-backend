@@ -1,4 +1,4 @@
-import { RedisModule } from '@/datasource/redis/module';
+import { DatasourceModule } from '@/datasource/module';
 import { ConnectConversationUseCase } from '@/domain/conversation/usecases/connect.usecase';
 import { JoinConversationUseCase } from '@/domain/conversation/usecases/join.usecase';
 import { LeaveConversationUseCase } from '@/domain/conversation/usecases/leave.usecase';
@@ -11,7 +11,7 @@ const conversationUseCases = [ConnectConversationUseCase, JoinConversationUseCas
 const gateways = [AppGateway, ConversationGateway];
 
 @Module({
-  imports: [RedisModule],
+  imports: [DatasourceModule],
   providers: [...gateways, ...conversationUseCases],
 })
-export class GatewaysModule {}
+export class TransportModule {}

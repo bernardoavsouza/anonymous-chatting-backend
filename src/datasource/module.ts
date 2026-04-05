@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { RedisDatasource } from './datasource';
+import { RedisDatasource } from './redis/datasource';
 
 @Module({
   providers: [RedisDatasource],
   exports: [RedisDatasource],
 })
-export class RedisModule {}
+export class DatasourceModule {}
