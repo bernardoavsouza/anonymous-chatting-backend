@@ -1,5 +1,5 @@
 import type { Conversation, Message } from '@/domain/conversation/interfaces';
-import type { User } from '@/domain/user.interface';
+import type { User } from '@/domain/interfaces';
 
 export const dummyIds = ['a3bb189e-8bf9-4d3f-9e3b-4e2c6f1a1b2c', '7c9e6679-7425-40de-944b-e07fc1f90ae7'];
 

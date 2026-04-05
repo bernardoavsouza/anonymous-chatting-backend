@@ -1,6 +1,6 @@
 import { Transform } from 'class-transformer';
 import { IsDate, IsString, IsUUID, ValidateNested } from 'class-validator';
-import { User } from '../user.interface';
+import { User } from '../interfaces';
 
 export class Conversation {
   @IsUUID()

@@ -1,8 +1,8 @@
 import { RedisModule } from '@/datasource/redis/module';
-import { ConnectConversationUseCase } from '@/domain/conversation/connect.usecase';
-import { JoinConversationUseCase } from '@/domain/conversation/join.usecase';
-import { LeaveConversationUseCase } from '@/domain/conversation/leave.usecase';
-import { SendMessageUseCase } from '@/domain/conversation/send-message.usecase';
+import { ConnectConversationUseCase } from '@/domain/conversation/usecases/connect.usecase';
+import { JoinConversationUseCase } from '@/domain/conversation/usecases/join.usecase';
+import { LeaveConversationUseCase } from '@/domain/conversation/usecases/leave.usecase';
+import { SendMessageUseCase } from '@/domain/conversation/usecases/send-message.usecase';
 import { Module } from '@nestjs/common';
 import { AppGateway } from './app.gateway';
 import { ConversationGateway } from './conversation/gateway';

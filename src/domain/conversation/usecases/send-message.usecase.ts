@@ -2,8 +2,8 @@ import { ConversationEvent } from '@/transport/conversation/types';
 import { InputPort } from '@/transport/ports';
 import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
-import { UseCase } from '../usecase.interface';
-import { SendMessageDTO } from './dto';
+import { UseCase } from '../../interfaces';
+import { SendMessageDTO } from '../dto';
 
 type SendMessageInput = { socket: Socket } & SendMessageDTO;
 

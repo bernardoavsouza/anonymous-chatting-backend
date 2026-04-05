@@ -2,7 +2,7 @@ import { ConversationEvent } from '@/transport/conversation/types';
 import type { Socket } from 'socket.io';
 import { dummyConversation, dummyUsers } from '~/dummies';
 import { MockedSocket } from '~/socket.io';
-import { LeaveConversationUseCase } from '../leave.usecase';
+import { LeaveConversationUseCase } from '../usecases/leave.usecase';
 
 describe('LeaveConversationUseCase', () => {
   let useCase: LeaveConversationUseCase;

@@ -1,4 +1,4 @@
-import { ConnectConversationUseCase } from '@/domain/conversation/connect.usecase';
+import { ConnectConversationUseCase } from '@/domain/conversation/usecases/connect.usecase';
 import { Test } from '@nestjs/testing';
 import type { Socket } from 'socket.io';
 import { dummyConversation, dummyUsers } from '~/dummies';

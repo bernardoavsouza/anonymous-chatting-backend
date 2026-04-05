@@ -1,7 +1,7 @@
 import { RedisDatasource } from '@/datasource/redis/datasource';
-import { JoinConversationUseCase } from '@/domain/conversation/join.usecase';
-import { LeaveConversationUseCase } from '@/domain/conversation/leave.usecase';
-import { SendMessageUseCase } from '@/domain/conversation/send-message.usecase';
+import { JoinConversationUseCase } from '@/domain/conversation/usecases/join.usecase';
+import { LeaveConversationUseCase } from '@/domain/conversation/usecases/leave.usecase';
+import { SendMessageUseCase } from '@/domain/conversation/usecases/send-message.usecase';
 import { Test } from '@nestjs/testing';
 import type { Socket } from 'socket.io';
 import { dummyConversation, dummyDate, dummyIds, dummyUsers } from '~/dummies';

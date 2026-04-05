@@ -1,5 +1,5 @@
 import { RedisDatasource } from '@/datasource/redis/datasource';
-import { ConnectConversationUseCase } from '@/domain/conversation/connect.usecase';
+import { ConnectConversationUseCase } from '@/domain/conversation/usecases/connect.usecase';
 import { Test } from '@nestjs/testing';
 import { dummyConversation, dummyUsers } from '~/dummies';
 

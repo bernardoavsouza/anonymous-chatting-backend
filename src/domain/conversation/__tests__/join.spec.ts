@@ -4,7 +4,7 @@ import type { InputPort } from '@/transport/ports';
 import type { Socket } from 'socket.io';
 import { dummyConversation, dummyUsers } from '~/dummies';
 import { MockedSocket } from '~/socket.io';
-import { JoinConversationUseCase } from '../join.usecase';
+import { JoinConversationUseCase } from '../usecases/join.usecase';
 
 describe('JoinConversationUseCase', () => {
   let useCase: JoinConversationUseCase;

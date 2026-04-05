@@ -1,7 +1,7 @@
 import { RedisDatasource } from '@/datasource/redis/datasource';
-import { JoinConversationUseCase } from '@/domain/conversation/join.usecase';
-import { LeaveConversationUseCase } from '@/domain/conversation/leave.usecase';
-import { SendMessageUseCase } from '@/domain/conversation/send-message.usecase';
+import { JoinConversationUseCase } from '@/domain/conversation/usecases/join.usecase';
+import { LeaveConversationUseCase } from '@/domain/conversation/usecases/leave.usecase';
+import { SendMessageUseCase } from '@/domain/conversation/usecases/send-message.usecase';
 import { WsBody } from '@/transport/decorators/ws-body';
 import { BaseWebSocketGateway } from '@/transport/decorators/ws-gateway';
 import type { InputPort } from '@/transport/ports';

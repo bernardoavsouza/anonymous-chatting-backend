@@ -1,6 +1,6 @@
 import type { Conversation } from '@/domain/conversation/interfaces';
 import { Message } from '@/domain/conversation/interfaces';
-import type { User } from '@/domain/user.interface';
+import type { User } from '@/domain/interfaces';
 
 export class ConnectConversationDTO {
   nickname: string;

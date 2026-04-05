@@ -1,5 +1,5 @@
 import { Conversation, ConversationDetails, Message } from '@/domain/conversation/interfaces';
-import { User } from '@/domain/user.interface';
+import { User } from '@/domain/interfaces';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';

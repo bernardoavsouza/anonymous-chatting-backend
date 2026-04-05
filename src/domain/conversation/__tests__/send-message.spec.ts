@@ -2,7 +2,7 @@ import { ConversationEvent } from '@/transport/conversation/types';
 import type { Socket } from 'socket.io';
 import { dummyMessage } from '~/dummies';
 import { MockedSocket } from '~/socket.io';
-import { SendMessageUseCase } from '../send-message.usecase';
+import { SendMessageUseCase } from '../usecases/send-message.usecase';
 
 describe('SendMessageUseCase', () => {
   let useCase: SendMessageUseCase;

@@ -1,4 +1,4 @@
-import { ConnectConversationUseCase } from '@/domain/conversation/connect.usecase';
+import { ConnectConversationUseCase } from '@/domain/conversation/usecases/connect.usecase';
 import { Injectable } from '@nestjs/common';
 import { OnGatewayConnection, WebSocketGateway } from '@nestjs/websockets';
 import { Socket } from 'socket.io';

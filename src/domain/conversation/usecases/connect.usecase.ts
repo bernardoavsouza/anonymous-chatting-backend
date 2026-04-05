@@ -1,9 +1,9 @@
 import { RedisDatasource } from '@/datasource/redis/datasource';
 import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
-import { UseCase } from '../usecase.interface';
-import type { User } from '../user.interface';
-import { ConnectConversationDTO, ConnectConversationResultDTO } from './dto';
+import type { User } from '../../interfaces';
+import { UseCase } from '../../interfaces';
+import { ConnectConversationDTO, ConnectConversationResultDTO } from '../dto';
 
 @Injectable()
 export class ConnectConversationUseCase implements UseCase<ConnectConversationDTO, ConnectConversationResultDTO> {
