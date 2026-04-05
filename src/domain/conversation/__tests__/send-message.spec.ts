@@ -2,19 +2,19 @@ import { ConversationEvent } from '@/transport/conversation/types';
 import type { Socket } from 'socket.io';
 import { dummyMessage } from '~/dummies';
 import { MockedSocket } from '~/socket.io';
-import { ConversationService } from '../service';
+import { SendMessageUseCase } from '../send-message.usecase';
 
-describe('Conversation message service', () => {
-  let service: ConversationService;
+describe('SendMessageUseCase', () => {
+  let useCase: SendMessageUseCase;
   let socket: Socket;
 
   beforeEach(() => {
-    service = new ConversationService();
+    useCase = new SendMessageUseCase();
     socket = MockedSocket();
   });
 
-  it('should emit message to the same room', () => {
-    service.sendMessage(socket, dummyMessage);
+  it('should emit message to the conversation', () => {
+    useCase.execute({ socket, ...dummyMessage });
 
     expect(socket.to).toHaveBeenCalledWith(dummyMessage.conversationId);
     expect(socket.to(dummyMessage.conversationId).emit).toHaveBeenCalledWith(ConversationEvent.MESSAGE, {

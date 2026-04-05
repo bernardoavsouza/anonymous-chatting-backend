@@ -4,38 +4,29 @@ import type { InputPort } from '@/transport/ports';
 import type { Socket } from 'socket.io';
 import { dummyConversation, dummyUsers } from '~/dummies';
 import { MockedSocket } from '~/socket.io';
-import { ConversationService } from '../service';
+import { JoinConversationUseCase } from '../join.usecase';
 
-describe('Conversation join service', () => {
-  let service: ConversationService;
+describe('JoinConversationUseCase', () => {
+  let useCase: JoinConversationUseCase;
   let socket: Socket;
 
   beforeEach(() => {
-    service = new ConversationService();
+    useCase = new JoinConversationUseCase();
     socket = MockedSocket();
   });
 
-  it('should join room on conversation join event', () => {
-    service.join(socket, {
-      conversationId: dummyConversation.id,
-      userId: dummyUsers[0].id,
-    });
+  it('should join room', () => {
+    useCase.execute({ socket, conversationId: dummyConversation.id, userId: dummyUsers[0].id });
 
     expect(socket.join).toHaveBeenCalledWith(dummyConversation.id);
   });
 
-  it('should emit conversation join event to the same conversation', () => {
-    service.join(socket, {
-      conversationId: dummyConversation.id,
-      userId: dummyUsers[0].id,
-    });
+  it('should emit join event to the conversation', () => {
+    useCase.execute({ socket, conversationId: dummyConversation.id, userId: dummyUsers[0].id });
 
     expect(socket.to).toHaveBeenCalledWith(dummyConversation.id);
     expect(socket.emit).toHaveBeenCalledWith(ConversationEvent.JOIN, {
-      data: {
-        conversationId: dummyConversation.id,
-        userId: dummyUsers[0].id,
-      },
+      data: { conversationId: dummyConversation.id, userId: dummyUsers[0].id },
       timestamp: expect.any(Date),
     } satisfies InputPort<ConversationJoinInputDTO>);
   });

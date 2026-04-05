@@ -1,21 +1,12 @@
 import { RedisDatasource } from '@/datasource/redis/datasource';
-import type { Conversation } from '@/domain/conversation/interfaces';
-import type { User } from '@/domain/user.interface';
 import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
-
-export class ConnectConversationDTO {
-  nickname: string;
-  conversationId?: Conversation['id'];
-}
-
-export class ConnectConversationResultDTO {
-  userId: User['id'];
-  conversationId: Conversation['id'];
-}
+import { UseCase } from '../usecase.interface';
+import type { User } from '../user.interface';
+import { ConnectConversationDTO, ConnectConversationResultDTO } from './dto';
 
 @Injectable()
-export class ConnectConversationUseCase {
+export class ConnectConversationUseCase implements UseCase<ConnectConversationDTO, ConnectConversationResultDTO> {
   constructor(private readonly redis: RedisDatasource) {}
 
   async execute({ conversationId }: ConnectConversationDTO): Promise<ConnectConversationResultDTO> {

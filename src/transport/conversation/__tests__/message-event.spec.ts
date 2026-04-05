@@ -1,5 +1,7 @@
 import { RedisDatasource } from '@/datasource/redis/datasource';
-import { ConversationService } from '@/domain/conversation/service';
+import { JoinConversationUseCase } from '@/domain/conversation/join.usecase';
+import { LeaveConversationUseCase } from '@/domain/conversation/leave.usecase';
+import { SendMessageUseCase } from '@/domain/conversation/send-message.usecase';
 import { Test } from '@nestjs/testing';
 import type { Socket } from 'socket.io';
 import { dummyDate, dummyMessage } from '~/dummies';
@@ -9,11 +11,9 @@ import { ConversationGateway } from '../gateway';
 describe('Conversation message event', () => {
   let socket: Socket;
   let conversationGateway: ConversationGateway;
-  let conversationService: ConversationService;
-  let redisService: RedisDatasource;
 
-  const conversationServiceMock = {
-    sendMessage: jest.fn(),
+  const sendMessageUseCaseMock = {
+    execute: jest.fn(),
   };
 
   const redisServiceMock = {
@@ -25,58 +25,34 @@ describe('Conversation message event', () => {
     const app = await Test.createTestingModule({
       providers: [
         ConversationGateway,
-        {
-          provide: ConversationService,
-          useValue: conversationServiceMock,
-        },
-        {
-          provide: RedisDatasource,
-          useValue: redisServiceMock,
-        },
+        { provide: JoinConversationUseCase, useValue: { execute: jest.fn() } },
+        { provide: LeaveConversationUseCase, useValue: { execute: jest.fn() } },
+        { provide: SendMessageUseCase, useValue: sendMessageUseCaseMock },
+        { provide: RedisDatasource, useValue: redisServiceMock },
       ],
     }).compile();
     conversationGateway = app.get<ConversationGateway>(ConversationGateway);
-    conversationService = app.get<ConversationService>(ConversationService);
-    redisService = app.get<RedisDatasource>(RedisDatasource);
   });
 
-  it('should call conversation send message conversationService if conversation is found', () => {
+  it('should call send message use case if client is in the room', async () => {
     socket.join(dummyMessage.conversationId);
 
-    conversationGateway.handleMessage(
-      {
-        data: dummyMessage,
-        timestamp: dummyDate,
-      },
-      socket,
-    );
+    await conversationGateway.handleMessage({ data: dummyMessage, timestamp: dummyDate }, socket);
 
-    expect(conversationService.sendMessage).toHaveBeenCalledWith(socket, dummyMessage);
+    expect(sendMessageUseCaseMock.execute).toHaveBeenCalledWith({ socket, ...dummyMessage });
   });
 
-  it('should not call conversation send message conversationService if conversation is not found', () => {
-    conversationGateway.handleMessage(
-      {
-        data: dummyMessage,
-        timestamp: dummyDate,
-      },
-      socket,
-    );
+  it('should not call send message use case if client is not in the room', async () => {
+    await conversationGateway.handleMessage({ data: dummyMessage, timestamp: dummyDate }, socket);
 
-    expect(conversationService.sendMessage).not.toHaveBeenCalled();
+    expect(sendMessageUseCaseMock.execute).not.toHaveBeenCalled();
   });
 
-  it('should ask to redisService to save message', () => {
+  it('should save message in redis', async () => {
     socket.join(dummyMessage.conversationId);
 
-    conversationGateway.handleMessage(
-      {
-        data: dummyMessage,
-        timestamp: dummyDate,
-      },
-      socket,
-    );
+    await conversationGateway.handleMessage({ data: dummyMessage, timestamp: dummyDate }, socket);
 
-    expect(redisService.appendMessage).toHaveBeenCalledWith(dummyMessage);
+    expect(redisServiceMock.appendMessage).toHaveBeenCalledWith(dummyMessage);
   });
 });

@@ -1,5 +1,7 @@
 import { RedisDatasource } from '@/datasource/redis/datasource';
-import { ConversationService } from '@/domain/conversation/service';
+import { JoinConversationUseCase } from '@/domain/conversation/join.usecase';
+import { LeaveConversationUseCase } from '@/domain/conversation/leave.usecase';
+import { SendMessageUseCase } from '@/domain/conversation/send-message.usecase';
 import { WsBody } from '@/transport/decorators/ws-body';
 import { BaseWebSocketGateway } from '@/transport/decorators/ws-gateway';
 import type { InputPort } from '@/transport/ports';
@@ -11,17 +13,16 @@ import { ConversationEvent } from './types';
 @BaseWebSocketGateway()
 export class ConversationGateway {
   constructor(
-    private readonly conversationService: ConversationService,
+    private readonly joinUseCase: JoinConversationUseCase,
+    private readonly leaveUseCase: LeaveConversationUseCase,
+    private readonly sendMessageUseCase: SendMessageUseCase,
     private readonly redisService: RedisDatasource,
   ) {}
 
   @SubscribeMessage(ConversationEvent.JOIN)
   handleJoin(@WsBody(ConversationJoinInputDTO) input: InputPort<ConversationJoinInputDTO>, @ConnectedSocket() client: Socket): void {
-    this.conversationService.join(client, input.data);
-    this.redisService.upsertDetails({
-      conversationId: input.data.conversationId,
-      userId: input.data.userId,
-    });
+    this.joinUseCase.execute({ socket: client, ...input.data });
+    this.redisService.upsertDetails({ conversationId: input.data.conversationId, userId: input.data.userId });
   }
 
   @SubscribeMessage(ConversationEvent.MESSAGE)
@@ -31,7 +32,7 @@ export class ConversationGateway {
   ): Promise<void> {
     if (!client.rooms.has(input.data.conversationId)) return;
 
-    this.conversationService.sendMessage(client, input.data);
+    this.sendMessageUseCase.execute({ socket: client, ...input.data });
     await this.redisService.appendMessage(input.data);
   }
 
@@ -40,7 +41,7 @@ export class ConversationGateway {
     @WsBody(ConversationLeaveInputDTO) input: InputPort<ConversationLeaveInputDTO>,
     @ConnectedSocket() client: Socket,
   ): Promise<void> {
-    this.conversationService.leave(client, input.data);
+    this.leaveUseCase.execute({ socket: client, ...input.data });
 
     if (!client.rooms.has(input.data.conversationId)) {
       await this.redisService.eraseConversation(input.data.conversationId);
