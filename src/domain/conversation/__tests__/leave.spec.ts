@@ -1,6 +1,6 @@
 import { ConversationEvent } from '@/transport/conversation/types';
 import type { Socket } from 'socket.io';
-import { dummyConversation, dummyUser } from '~/dummies';
+import { dummyConversation, dummyUsers } from '~/dummies';
 import { MockedSocket } from '~/socket.io';
 import { ConversationService } from '../service';
 
@@ -16,7 +16,7 @@ describe('Conversation leave service', () => {
   it('should leave room on conversation leave event', () => {
     service.leave(socket, {
       conversationId: dummyConversation.id,
-      userId: dummyUser.id,
+      userId: dummyUsers[0].id,
     });
 
     expect(socket.leave).toHaveBeenCalledWith(dummyConversation.id);
@@ -25,14 +25,14 @@ describe('Conversation leave service', () => {
   it('should emit conversation leave event to the same conversation', () => {
     service.leave(socket, {
       conversationId: dummyConversation.id,
-      userId: dummyUser.id,
+      userId: dummyUsers[0].id,
     });
 
     expect(socket.to).toHaveBeenCalledWith(dummyConversation.id);
     expect(socket.to(dummyConversation.id).emit).toHaveBeenCalledWith(ConversationEvent.LEAVE, {
       data: {
         conversationId: dummyConversation.id,
-        userId: dummyUser.id,
+        userId: dummyUsers[0].id,
       },
       timestamp: expect.any(Date),
     });

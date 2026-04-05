@@ -1,8 +1,9 @@
 import { RedisDatasource } from '@/datasource/redis/datasource';
+import { ConnectConversationUseCase } from '@/domain/conversation/connect.usecase';
 import { ConversationService } from '@/domain/conversation/service';
 import { Test } from '@nestjs/testing';
 import type { Socket } from 'socket.io';
-import { dummyConversation, dummyDate, dummyIds, dummyUser } from '~/dummies';
+import { dummyConversation, dummyDate, dummyIds, dummyUsers } from '~/dummies';
 import { MockedSocket } from '~/socket.io';
 import { ConversationGateway } from '../gateway';
 
@@ -19,6 +20,10 @@ describe('Conversation leave event', () => {
     eraseConversation: jest.fn(),
   };
 
+  const connectUseCaseMock = {
+    execute: jest.fn(),
+  };
+
   beforeEach(async () => {
     socket = MockedSocket();
     const app = await Test.createTestingModule({
@@ -32,6 +37,10 @@ describe('Conversation leave event', () => {
           provide: RedisDatasource,
           useValue: redisServiceMock,
         },
+        {
+          provide: ConnectConversationUseCase,
+          useValue: connectUseCaseMock,
+        },
       ],
     }).compile();
     conversationGateway = app.get<ConversationGateway>(ConversationGateway);
@@ -42,7 +51,7 @@ describe('Conversation leave event', () => {
     conversationGateway.handleLeave(
       {
         data: {
-          userId: dummyUser.id,
+          userId: dummyUsers[0].id,
           conversationId: dummyConversation.id,
         },
         timestamp: dummyDate,
@@ -52,7 +61,7 @@ describe('Conversation leave event', () => {
 
     expect(service.leave).toHaveBeenCalledWith(socket, {
       conversationId: dummyConversation.id,
-      userId: dummyUser.id,
+      userId: dummyUsers[0].id,
     });
   });
 
@@ -60,7 +69,7 @@ describe('Conversation leave event', () => {
     conversationGateway.handleLeave(
       {
         data: {
-          userId: dummyUser.id,
+          userId: dummyUsers[0].id,
           conversationId: dummyConversation.id,
         },
         timestamp: dummyDate,
@@ -78,7 +87,7 @@ describe('Conversation leave event', () => {
     conversationGateway.handleLeave(
       {
         data: {
-          userId: dummyUser.id,
+          userId: dummyUsers[0].id,
           conversationId: dummyConversation.id,
         },
         timestamp: dummyDate,

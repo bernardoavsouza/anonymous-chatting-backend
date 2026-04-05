@@ -12,10 +12,16 @@ export const dummyMessage: Message = {
   senderId: dummyIds[1] as string,
 };
 
-export const dummyUser: User = {
-  id: dummyIds[1] as string,
-  nickname: 'dummy nickname',
-};
+export const dummyUsers: [User, User] = [
+  {
+    id: dummyIds[1] as string,
+    nickname: 'dummy nickname 1',
+  },
+  {
+    id: dummyIds[2] as string,
+    nickname: 'dummy nickname 2',
+  },
+];
 
 export const dummyConversation: Conversation = {
   id: dummyIds[0] as string,

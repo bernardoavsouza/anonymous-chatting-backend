@@ -12,6 +12,7 @@ export class MockedSocket1 implements Partial<Socket> {
   });
   public disconnect = jest.fn();
   public rooms = new Set<string>();
+  public handshake = { auth: {} as Record<string, string> } as Socket['handshake'];
 }
 
 export const MockedSocket = jest.fn(() => new MockedSocket1()) as unknown as jest.Mock<Socket>;

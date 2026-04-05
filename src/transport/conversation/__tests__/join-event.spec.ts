@@ -1,8 +1,9 @@
 import { RedisDatasource } from '@/datasource/redis/datasource';
+import { ConnectConversationUseCase } from '@/domain/conversation/connect.usecase';
 import { ConversationService } from '@/domain/conversation/service';
 import { Test } from '@nestjs/testing';
 import type { Socket } from 'socket.io';
-import { dummyConversation, dummyDate, dummyUser } from '~/dummies';
+import { dummyConversation, dummyDate, dummyUsers } from '~/dummies';
 import { mockDate } from '~/globals/date';
 import { MockedSocket } from '~/socket.io';
 import { ConversationGateway } from '../gateway';
@@ -19,6 +20,10 @@ describe('Conversation join event', () => {
   const redisServiceMock = {
     appendMessage: jest.fn().mockResolvedValue(undefined),
     upsertDetails: jest.fn().mockResolvedValue(undefined),
+  };
+
+  const connectUseCaseMock = {
+    execute: jest.fn(),
   };
 
   beforeAll(() => {
@@ -38,6 +43,10 @@ describe('Conversation join event', () => {
           provide: RedisDatasource,
           useValue: redisServiceMock,
         },
+        {
+          provide: ConnectConversationUseCase,
+          useValue: connectUseCaseMock,
+        },
       ],
     }).compile();
     conversationGateway = app.get<ConversationGateway>(ConversationGateway);
@@ -48,7 +57,7 @@ describe('Conversation join event', () => {
     conversationGateway.handleJoin(
       {
         data: {
-          userId: dummyUser.id,
+          userId: dummyUsers[0].id,
           conversationId: dummyConversation.id,
         },
         timestamp: dummyDate,
@@ -58,7 +67,7 @@ describe('Conversation join event', () => {
 
     expect(service.join).toHaveBeenCalledWith(socket, {
       conversationId: dummyConversation.id,
-      userId: dummyUser.id,
+      userId: dummyUsers[0].id,
     });
   });
 
@@ -66,7 +75,7 @@ describe('Conversation join event', () => {
     conversationGateway.handleJoin(
       {
         data: {
-          userId: dummyUser.id,
+          userId: dummyUsers[0].id,
           conversationId: dummyConversation.id,
         },
         timestamp: dummyDate,
@@ -76,7 +85,7 @@ describe('Conversation join event', () => {
 
     expect(redisServiceMock.upsertDetails).toHaveBeenCalledWith({
       conversationId: dummyConversation.id,
-      userId: dummyUser.id,
+      userId: dummyUsers[0].id,
     });
   });
 });

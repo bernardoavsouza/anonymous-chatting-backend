@@ -1,6 +1,6 @@
 import { ConfigService } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
-import { dummyConversation, dummyDate, dummyIds, dummyMessage, dummyUser } from '~/dummies';
+import { dummyConversation, dummyDate, dummyIds, dummyMessage, dummyUsers } from '~/dummies';
 import { mockDate } from '~/globals/date';
 import { RedisDatasource } from '../datasource';
 
@@ -40,14 +40,14 @@ describe('Redis messages service', () => {
   it('should be able to create conversation details', async () => {
     await redisService.upsertDetails({
       conversationId: dummyConversation.id,
-      userId: dummyUser.id,
+      userId: dummyUsers[0].id,
     });
 
     expect(redisService.client.set).toHaveBeenCalledWith(
       `details-${dummyConversation.id}`,
       JSON.stringify({
         conversationId: dummyConversation.id,
-        users: [dummyUser.id],
+        users: [dummyUsers[0].id],
         createdAt: dummyDate,
       }),
     );
