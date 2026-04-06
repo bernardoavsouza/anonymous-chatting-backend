@@ -1,4 +1,3 @@
-import { RedisDatasource } from '@/datasource/redis/datasource';
 import { JoinConversationUseCase } from '@/domain/conversation/usecases/join.usecase';
 import { LeaveConversationUseCase } from '@/domain/conversation/usecases/leave.usecase';
 import { SendMessageUseCase } from '@/domain/conversation/usecases/send-message.usecase';
@@ -10,15 +9,9 @@ import { ConversationGateway } from '../gateway';
 
 describe('Conversation message event', () => {
   let socket: Socket;
-  let conversationGateway: ConversationGateway;
+  let gateway: ConversationGateway;
 
-  const sendMessageUseCaseMock = {
-    execute: jest.fn(),
-  };
-
-  const redisServiceMock = {
-    appendMessage: jest.fn(),
-  };
+  const sendMessageUseCaseMock = { execute: jest.fn() };
 
   beforeEach(async () => {
     socket = MockedSocket();
@@ -28,31 +21,22 @@ describe('Conversation message event', () => {
         { provide: JoinConversationUseCase, useValue: { execute: jest.fn() } },
         { provide: LeaveConversationUseCase, useValue: { execute: jest.fn() } },
         { provide: SendMessageUseCase, useValue: sendMessageUseCaseMock },
-        { provide: RedisDatasource, useValue: redisServiceMock },
       ],
     }).compile();
-    conversationGateway = app.get<ConversationGateway>(ConversationGateway);
+    gateway = app.get(ConversationGateway);
   });
 
   it('should call send message use case if client is in the room', async () => {
     socket.join(dummyMessage.conversationId);
 
-    await conversationGateway.handleMessage({ data: dummyMessage, timestamp: dummyDate }, socket);
+    await gateway.handleMessage({ data: dummyMessage, timestamp: dummyDate }, socket);
 
     expect(sendMessageUseCaseMock.execute).toHaveBeenCalledWith({ socket, ...dummyMessage });
   });
 
   it('should not call send message use case if client is not in the room', async () => {
-    await conversationGateway.handleMessage({ data: dummyMessage, timestamp: dummyDate }, socket);
+    await gateway.handleMessage({ data: dummyMessage, timestamp: dummyDate }, socket);
 
     expect(sendMessageUseCaseMock.execute).not.toHaveBeenCalled();
-  });
-
-  it('should save message in redis', async () => {
-    socket.join(dummyMessage.conversationId);
-
-    await conversationGateway.handleMessage({ data: dummyMessage, timestamp: dummyDate }, socket);
-
-    expect(redisServiceMock.appendMessage).toHaveBeenCalledWith(dummyMessage);
   });
 });

@@ -1,6 +1,6 @@
 import { ConfigService } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
-import { dummyConversation, dummyDate, dummyIds, dummyMessage, dummyUsers } from '~/dummies';
+import { dummyConversation, dummyDate, dummyMessage, dummyUsers } from '~/dummies';
 import { mockDate } from '~/globals/date';
 import { RedisDatasource } from '../datasource';
 
@@ -56,12 +56,12 @@ describe('Redis messages service', () => {
   it('should be able to add new users to conversation details', async () => {
     await redisService.upsertDetails({
       conversationId: dummyConversation.id,
-      userId: dummyIds[0] as string,
+      userId: dummyUsers[0].id,
     });
 
     await redisService.upsertDetails({
       conversationId: dummyConversation.id,
-      userId: dummyIds[1] as string,
+      userId: dummyUsers[1].id,
     });
 
     const redisSetter = redisService.client.set as jest.Mock;
@@ -70,7 +70,7 @@ describe('Redis messages service', () => {
       `details-${dummyConversation.id}`,
       JSON.stringify({
         conversationId: dummyConversation.id,
-        users: [dummyIds[0], dummyIds[1]],
+        users: [dummyUsers[0].id, dummyUsers[1].id],
         createdAt: dummyDate,
       }),
     ]);
