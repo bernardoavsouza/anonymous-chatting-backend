@@ -1,6 +1,8 @@
 import { JoinConversationUseCase } from '@/domain/conversation/usecases/join.usecase';
 import { LeaveConversationUseCase } from '@/domain/conversation/usecases/leave.usecase';
 import { SendMessageUseCase } from '@/domain/conversation/usecases/send-message.usecase';
+import { ConversationEvent } from '@/transport/conversation/types';
+import type { InputPort } from '@/transport/ports';
 import { Test } from '@nestjs/testing';
 import type { Socket } from 'socket.io';
 import { dummyConversation, dummyDate, dummyUsers } from '~/dummies';
@@ -31,11 +33,26 @@ describe('Conversation join event', () => {
     gateway = app.get(ConversationGateway);
   });
 
-  it('should call join use case with socket and data', () => {
-    gateway.handleJoin({ data: { userId: dummyUsers[0].id, conversationId: dummyConversation.id }, timestamp: dummyDate }, socket);
+  it('should join socket to the room', async () => {
+    await gateway.handleJoin({ data: { userId: dummyUsers[0].id, conversationId: dummyConversation.id }, timestamp: dummyDate }, socket);
+
+    expect(socket.join).toHaveBeenCalledWith(dummyConversation.id);
+  });
+
+  it('should emit join event to the conversation', async () => {
+    await gateway.handleJoin({ data: { userId: dummyUsers[0].id, conversationId: dummyConversation.id }, timestamp: dummyDate }, socket);
+
+    expect(socket.to).toHaveBeenCalledWith(dummyConversation.id);
+    expect(socket.to(dummyConversation.id).emit).toHaveBeenCalledWith(ConversationEvent.JOIN, {
+      data: { userId: dummyUsers[0].id, conversationId: dummyConversation.id },
+      timestamp: dummyDate,
+    } satisfies InputPort<{ userId: string; conversationId: string }>);
+  });
+
+  it('should call join use case with data', async () => {
+    await gateway.handleJoin({ data: { userId: dummyUsers[0].id, conversationId: dummyConversation.id }, timestamp: dummyDate }, socket);
 
     expect(joinUseCaseMock.execute).toHaveBeenCalledWith({
-      socket,
       conversationId: dummyConversation.id,
       userId: dummyUsers[0].id,
     });

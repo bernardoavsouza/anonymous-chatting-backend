@@ -1,9 +1,12 @@
 import { JoinConversationUseCase } from '@/domain/conversation/usecases/join.usecase';
 import { LeaveConversationUseCase } from '@/domain/conversation/usecases/leave.usecase';
 import { SendMessageUseCase } from '@/domain/conversation/usecases/send-message.usecase';
+import { ConversationEvent } from '@/transport/conversation/types';
+import type { InputPort } from '@/transport/ports';
 import { Test } from '@nestjs/testing';
 import type { Socket } from 'socket.io';
 import { dummyDate, dummyMessage } from '~/dummies';
+import { mockDate } from '~/globals/date';
 import { MockedSocket } from '~/socket.io';
 import { ConversationGateway } from '../gateway';
 
@@ -12,6 +15,10 @@ describe('Conversation message event', () => {
   let gateway: ConversationGateway;
 
   const sendMessageUseCaseMock = { execute: jest.fn() };
+
+  beforeAll(() => {
+    mockDate();
+  });
 
   beforeEach(async () => {
     socket = MockedSocket();
@@ -26,12 +33,24 @@ describe('Conversation message event', () => {
     gateway = app.get(ConversationGateway);
   });
 
-  it('should call send message use case if client is in the room', async () => {
+  it('should emit message event to the conversation', async () => {
     socket.join(dummyMessage.conversationId);
 
     await gateway.handleMessage({ data: dummyMessage, timestamp: dummyDate }, socket);
 
-    expect(sendMessageUseCaseMock.execute).toHaveBeenCalledWith({ socket, ...dummyMessage });
+    expect(socket.to).toHaveBeenCalledWith(dummyMessage.conversationId);
+    expect(socket.to(dummyMessage.conversationId).emit).toHaveBeenCalledWith(ConversationEvent.MESSAGE, {
+      data: dummyMessage,
+      timestamp: dummyDate,
+    } satisfies InputPort<typeof dummyMessage>);
+  });
+
+  it('should call send message use case with data', async () => {
+    socket.join(dummyMessage.conversationId);
+
+    await gateway.handleMessage({ data: dummyMessage, timestamp: dummyDate }, socket);
+
+    expect(sendMessageUseCaseMock.execute).toHaveBeenCalledWith(dummyMessage);
   });
 
   it('should not call send message use case if client is not in the room', async () => {

@@ -19,7 +19,12 @@ export class ConversationGateway {
 
   @SubscribeMessage(ConversationEvent.JOIN)
   async handleJoin(@WsBody(ConversationJoinInputDTO) input: InputPort<ConversationJoinInputDTO>, @ConnectedSocket() client: Socket): Promise<void> {
-    await this.joinUseCase.execute({ socket: client, ...input.data });
+    await this.joinUseCase.execute(input.data);
+
+    client.join(input.data.conversationId);
+    client
+      .to(input.data.conversationId)
+      .emit(ConversationEvent.JOIN, { data: input.data, timestamp: new Date() } satisfies InputPort<ConversationJoinInputDTO>);
   }
 
   @SubscribeMessage(ConversationEvent.MESSAGE)
@@ -28,8 +33,11 @@ export class ConversationGateway {
     @ConnectedSocket() client: Socket,
   ): Promise<void> {
     if (!client.rooms.has(input.data.conversationId)) return;
+    await this.sendMessageUseCase.execute(input.data);
 
-    await this.sendMessageUseCase.execute({ socket: client, ...input.data });
+    client
+      .to(input.data.conversationId)
+      .emit(ConversationEvent.MESSAGE, { data: input.data, timestamp: new Date() } satisfies InputPort<ConversationMessageInputDTO>);
   }
 
   @SubscribeMessage(ConversationEvent.LEAVE)
@@ -37,6 +45,11 @@ export class ConversationGateway {
     @WsBody(ConversationLeaveInputDTO) input: InputPort<ConversationLeaveInputDTO>,
     @ConnectedSocket() client: Socket,
   ): Promise<void> {
-    await this.leaveUseCase.execute({ socket: client, ...input.data });
+    await this.leaveUseCase.execute(input.data);
+
+    client.leave(input.data.conversationId);
+    client
+      .to(input.data.conversationId)
+      .emit(ConversationEvent.LEAVE, { data: input.data, timestamp: new Date() } satisfies InputPort<ConversationLeaveInputDTO>);
   }
 }
