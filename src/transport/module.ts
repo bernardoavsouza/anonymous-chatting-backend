@@ -1,24 +1,10 @@
-import { DatasourceModule } from '@/datasource/module';
-import { ConnectConversationUseCase } from '@/domain/conversation/usecases/connect.usecase';
-import { DisconnectConversationUseCase } from '@/domain/conversation/usecases/disconnect.usecase';
-import { JoinConversationUseCase } from '@/domain/conversation/usecases/join.usecase';
-import { LeaveConversationUseCase } from '@/domain/conversation/usecases/leave.usecase';
-import { SendMessageUseCase } from '@/domain/conversation/usecases/send-message.usecase';
+import { ConversationModule } from '@/domain/conversation/module';
 import { Module } from '@nestjs/common';
 import { AppGateway } from './app.gateway';
 import { ConversationGateway } from './conversation/gateway';
 
-const conversationUseCases = [
-  ConnectConversationUseCase,
-  DisconnectConversationUseCase,
-  JoinConversationUseCase,
-  LeaveConversationUseCase,
-  SendMessageUseCase,
-];
-const gateways = [AppGateway, ConversationGateway];
-
 @Module({
-  imports: [DatasourceModule],
-  providers: [...gateways, ...conversationUseCases],
+  imports: [ConversationModule],
+  providers: [AppGateway, ConversationGateway],
 })
 export class TransportModule {}
