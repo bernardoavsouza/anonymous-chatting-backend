@@ -1,5 +1,5 @@
 import { ConnectConversationUseCase } from '@/domain/conversation/usecases/connect.usecase';
-import { DisconnectConversationUseCase } from '@/domain/conversation/usecases/disconnect.usecase';
+import { LeaveConversationUseCase } from '@/domain/conversation/usecases/leave.usecase';
 import { Test } from '@nestjs/testing';
 import type { Socket } from 'socket.io';
 import { dummyConversation, dummyUsers } from '~/dummies';
@@ -11,7 +11,6 @@ describe('AppGateway (handleConnection)', () => {
   let gateway: AppGateway;
 
   const connectUseCaseMock = { execute: jest.fn() };
-  const disconnectUseCaseMock = { execute: jest.fn() };
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -21,7 +20,7 @@ describe('AppGateway (handleConnection)', () => {
       providers: [
         AppGateway,
         { provide: ConnectConversationUseCase, useValue: connectUseCaseMock },
-        { provide: DisconnectConversationUseCase, useValue: disconnectUseCaseMock },
+        { provide: LeaveConversationUseCase, useValue: { execute: jest.fn() } },
       ],
     }).compile();
 
@@ -53,33 +52,5 @@ describe('AppGateway (handleConnection)', () => {
     await gateway.handleConnection(socket);
 
     expect(socket.data).toEqual({ userId: dummyUsers[0].id, conversationId: dummyConversation.id });
-  });
-});
-
-describe('AppGateway (handleDisconnect)', () => {
-  let socket: Socket;
-  let gateway: AppGateway;
-
-  const disconnectUseCaseMock = { execute: jest.fn() };
-
-  beforeEach(async () => {
-    jest.clearAllMocks();
-    socket = MockedSocket();
-
-    const app = await Test.createTestingModule({
-      providers: [
-        AppGateway,
-        { provide: ConnectConversationUseCase, useValue: { execute: jest.fn() } },
-        { provide: DisconnectConversationUseCase, useValue: disconnectUseCaseMock },
-      ],
-    }).compile();
-
-    gateway = app.get(AppGateway);
-  });
-
-  it('should call disconnect use case with socket', async () => {
-    await gateway.handleDisconnect(socket);
-
-    expect(disconnectUseCaseMock.execute).toHaveBeenCalledWith(socket);
   });
 });
