@@ -1,4 +1,4 @@
-import { LeaveConversationDTO } from '@/domain/conversation/dto';
+import { ConnectedConversationDTO, LeaveConversationDTO } from '@/domain/conversation/dto';
 import { ConnectConversationUseCase } from '@/domain/conversation/usecases/connect.usecase';
 import { LeaveConversationUseCase } from '@/domain/conversation/usecases/leave.usecase';
 import { Injectable } from '@nestjs/common';
@@ -17,7 +17,14 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   async handleConnection(client: Socket): Promise<void> {
     const { nickname, conversationId } = client.handshake.auth;
-    client.data = await this.connectConversationUseCase.execute({ nickname, conversationId });
+    const userId = await this.connectConversationUseCase.execute({ nickname, conversationId });
+
+    client.data = { userId, conversationId };
+    client.join(conversationId);
+    client.to(conversationId).emit(ConversationEvent.JOIN, {
+      data: { nickname, userId, conversationId },
+      timestamp: new Date(),
+    } satisfies InputPort<ConnectedConversationDTO>);
   }
 
   async handleDisconnect(client: Socket): Promise<void> {

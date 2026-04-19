@@ -3,13 +3,6 @@ import { User } from '@/domain/interfaces';
 import { IsUUID } from 'class-validator';
 
 export class ConversationMessageInputDTO extends Message {}
-export class ConversationJoinInputDTO {
-  @IsUUID()
-  userId: User['id'];
-
-  @IsUUID()
-  conversationId: Message['conversationId'];
-}
 
 export class ConversationLeaveInputDTO {
   @IsUUID()

@@ -23,38 +23,38 @@ describe('ConnectConversationUseCase', () => {
     useCase = app.get(ConnectConversationUseCase);
   });
 
-  it('should return a new conversationId when none is provided', async () => {
-    const result = await useCase.execute({ nickname: dummyUsers[0].nickname });
+  it('should return a generated userId', async () => {
+    const userId = await useCase.execute({ nickname: dummyUsers[0].nickname });
 
-    expect(redisMock.getDetails).not.toHaveBeenCalled();
-    expect(redisMock.upsertDetails).toHaveBeenCalledWith({ conversationId: result.conversationId, userId: result.userId });
-    expect(result.conversationId).toEqual(uuidMatcher);
-  });
-
-  it('should return the same conversationId when it exists in redis', async () => {
-    redisMock.getDetails.mockResolvedValueOnce({ conversationId: dummyConversation.id, users: [], createdAt: new Date() });
-
-    const result = await useCase.execute({ nickname: dummyUsers[0].nickname, conversationId: dummyConversation.id });
-
-    expect(result.conversationId).toBe(dummyConversation.id);
-  });
-
-  it('should return a new conversationId when the provided one is not found in redis', async () => {
-    redisMock.getDetails.mockResolvedValueOnce(null);
-
-    const result = await useCase.execute({ nickname: dummyUsers[0].nickname, conversationId: dummyConversation.id });
-
-    expect(result.conversationId).not.toBe(dummyConversation.id);
-    expect(result.conversationId).toEqual(uuidMatcher);
-    expect(redisMock.upsertDetails).toHaveBeenCalledWith({ conversationId: result.conversationId, userId: result.userId });
+    expect(userId).toEqual(uuidMatcher);
   });
 
   it('should always return a new userId', async () => {
-    redisMock.getDetails.mockResolvedValue(null);
-
     const first = await useCase.execute({ nickname: dummyUsers[0].nickname });
     const second = await useCase.execute({ nickname: dummyUsers[1].nickname });
 
-    expect(first.userId).not.toBe(second.userId);
+    expect(first).not.toBe(second);
+  });
+
+  it('should create a new conversation when none is provided', async () => {
+    await useCase.execute({ nickname: dummyUsers[0].nickname });
+
+    expect(redisMock.upsertDetails).toHaveBeenCalledWith({ conversationId: uuidMatcher, userId: uuidMatcher });
+  });
+
+  it('should not create a new conversation when it exists in redis', async () => {
+    redisMock.getDetails.mockResolvedValueOnce({ conversationId: dummyConversation.id, users: [], createdAt: new Date() });
+
+    await useCase.execute({ nickname: dummyUsers[0].nickname, conversationId: dummyConversation.id });
+
+    expect(redisMock.upsertDetails).not.toHaveBeenCalled();
+  });
+
+  it('should create a new conversation when the provided one is not found in redis', async () => {
+    redisMock.getDetails.mockResolvedValueOnce(null);
+
+    await useCase.execute({ nickname: dummyUsers[0].nickname, conversationId: dummyConversation.id });
+
+    expect(redisMock.upsertDetails).toHaveBeenCalledWith({ conversationId: uuidMatcher, userId: uuidMatcher });
   });
 });

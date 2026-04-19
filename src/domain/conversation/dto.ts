@@ -3,11 +3,12 @@ import { Message } from '@/domain/conversation/interfaces';
 import type { User } from '@/domain/interfaces';
 
 export class ConnectConversationDTO {
-  nickname: string;
+  nickname: User['nickname'];
   conversationId?: Conversation['id'];
 }
 
-export class ConnectConversationResultDTO {
+export class ConnectedConversationDTO {
+  nickname: User['nickname'];
   userId: User['id'];
   conversationId: Conversation['id'];
 }

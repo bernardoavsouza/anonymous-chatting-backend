@@ -1,11 +1,10 @@
 import { DatasourceModule } from '@/datasource/module';
 import { Module } from '@nestjs/common';
 import { ConnectConversationUseCase } from './usecases/connect.usecase';
-import { JoinConversationUseCase } from './usecases/join.usecase';
 import { LeaveConversationUseCase } from './usecases/leave.usecase';
 import { SendMessageUseCase } from './usecases/send-message.usecase';
 
-const useCases = [ConnectConversationUseCase, JoinConversationUseCase, LeaveConversationUseCase, SendMessageUseCase];
+const useCases = [ConnectConversationUseCase, LeaveConversationUseCase, SendMessageUseCase];
 
 @Module({
   imports: [DatasourceModule],

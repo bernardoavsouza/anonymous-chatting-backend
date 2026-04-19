@@ -1,4 +1,3 @@
-import { JoinConversationUseCase } from '@/domain/conversation/usecases/join.usecase';
 import { LeaveConversationUseCase } from '@/domain/conversation/usecases/leave.usecase';
 import { SendMessageUseCase } from '@/domain/conversation/usecases/send-message.usecase';
 import { ConversationEvent } from '@/transport/conversation/types';
@@ -25,7 +24,6 @@ describe('Conversation message event', () => {
     const app = await Test.createTestingModule({
       providers: [
         ConversationGateway,
-        { provide: JoinConversationUseCase, useValue: { execute: jest.fn() } },
         { provide: LeaveConversationUseCase, useValue: { execute: jest.fn() } },
         { provide: SendMessageUseCase, useValue: sendMessageUseCaseMock },
       ],

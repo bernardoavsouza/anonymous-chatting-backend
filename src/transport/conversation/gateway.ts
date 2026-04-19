@@ -1,4 +1,3 @@
-import { JoinConversationUseCase } from '@/domain/conversation/usecases/join.usecase';
 import { LeaveConversationUseCase } from '@/domain/conversation/usecases/leave.usecase';
 import { SendMessageUseCase } from '@/domain/conversation/usecases/send-message.usecase';
 import { WsBody } from '@/transport/decorators/ws-body';
@@ -6,26 +5,15 @@ import { BaseWebSocketGateway } from '@/transport/decorators/ws-gateway';
 import type { InputPort } from '@/transport/ports';
 import { ConnectedSocket, SubscribeMessage } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
-import { ConversationJoinInputDTO, ConversationLeaveInputDTO, ConversationMessageInputDTO } from './dto';
+import { ConversationLeaveInputDTO, ConversationMessageInputDTO } from './dto';
 import { ConversationEvent } from './types';
 
 @BaseWebSocketGateway()
 export class ConversationGateway {
   constructor(
-    private readonly joinUseCase: JoinConversationUseCase,
     private readonly leaveUseCase: LeaveConversationUseCase,
     private readonly sendMessageUseCase: SendMessageUseCase,
   ) {}
-
-  @SubscribeMessage(ConversationEvent.JOIN)
-  async handleJoin(@WsBody(ConversationJoinInputDTO) input: InputPort<ConversationJoinInputDTO>, @ConnectedSocket() client: Socket): Promise<void> {
-    await this.joinUseCase.execute(input.data);
-
-    client.join(input.data.conversationId);
-    client
-      .to(input.data.conversationId)
-      .emit(ConversationEvent.JOIN, { data: input.data, timestamp: new Date() } satisfies InputPort<ConversationJoinInputDTO>);
-  }
 
   @SubscribeMessage(ConversationEvent.MESSAGE)
   async handleMessage(
