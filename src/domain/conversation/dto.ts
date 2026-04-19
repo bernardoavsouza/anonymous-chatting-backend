@@ -2,9 +2,13 @@ import type { Conversation } from '@/domain/conversation/interfaces';
 import { Message } from '@/domain/conversation/interfaces';
 import type { User } from '@/domain/interfaces';
 
-export class ConnectConversationDTO {
-  nickname: User['nickname'];
+export class ConnectConversationInputDTO {
   conversationId?: Conversation['id'];
+}
+
+export class ConnectConversationOutputDTO {
+  conversationId: Conversation['id'];
+  userId: User['id'];
 }
 
 export class ConnectedConversationDTO {

@@ -3,8 +3,8 @@ import { SendMessageUseCase } from '@/domain/conversation/usecases/send-message.
 import { WsBody } from '@/transport/decorators/ws-body';
 import { BaseWebSocketGateway } from '@/transport/decorators/ws-gateway';
 import type { InputPort } from '@/transport/ports';
+import type { AppSocket } from '@/transport/types';
 import { ConnectedSocket, SubscribeMessage } from '@nestjs/websockets';
-import { Socket } from 'socket.io';
 import { ConversationLeaveInputDTO, ConversationMessageInputDTO } from './dto';
 import { ConversationEvent } from './types';
 
@@ -18,7 +18,7 @@ export class ConversationGateway {
   @SubscribeMessage(ConversationEvent.MESSAGE)
   async handleMessage(
     @WsBody(ConversationMessageInputDTO) input: InputPort<ConversationMessageInputDTO>,
-    @ConnectedSocket() client: Socket,
+    @ConnectedSocket() client: AppSocket,
   ): Promise<void> {
     if (!client.rooms.has(input.data.conversationId)) return;
     await this.sendMessageUseCase.execute(input.data);
@@ -31,7 +31,7 @@ export class ConversationGateway {
   @SubscribeMessage(ConversationEvent.LEAVE)
   async handleLeave(
     @WsBody(ConversationLeaveInputDTO) input: InputPort<ConversationLeaveInputDTO>,
-    @ConnectedSocket() client: Socket,
+    @ConnectedSocket() client: AppSocket,
   ): Promise<void> {
     await this.leaveUseCase.execute(input.data);
 

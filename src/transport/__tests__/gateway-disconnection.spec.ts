@@ -2,14 +2,14 @@ import { ConnectConversationUseCase } from '@/domain/conversation/usecases/conne
 import { LeaveConversationUseCase } from '@/domain/conversation/usecases/leave.usecase';
 import { ConversationEvent } from '@/transport/conversation/types';
 import type { InputPort } from '@/transport/ports';
+import type { AppSocket } from '@/transport/types';
 import { Test } from '@nestjs/testing';
-import type { Socket } from 'socket.io';
 import { dummyConversation, dummyUsers } from '~/dummies';
 import { MockedSocket } from '~/socket.io';
 import { AppGateway } from '../app.gateway';
 
 describe('AppGateway (handleDisconnect)', () => {
-  let socket: Socket;
+  let socket: AppSocket;
   let gateway: AppGateway;
 
   const leaveUseCaseMock = { execute: jest.fn() };

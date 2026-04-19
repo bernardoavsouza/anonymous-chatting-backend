@@ -2,15 +2,15 @@ import { LeaveConversationUseCase } from '@/domain/conversation/usecases/leave.u
 import { SendMessageUseCase } from '@/domain/conversation/usecases/send-message.usecase';
 import { ConversationEvent } from '@/transport/conversation/types';
 import type { InputPort } from '@/transport/ports';
+import type { AppSocket } from '@/transport/types';
 import { Test } from '@nestjs/testing';
-import type { Socket } from 'socket.io';
 import { dummyDate, dummyMessage } from '~/dummies';
 import { mockDate } from '~/globals/date';
 import { MockedSocket } from '~/socket.io';
 import { ConversationGateway } from '../gateway';
 
 describe('Conversation message event', () => {
-  let socket: Socket;
+  let socket: AppSocket;
   let gateway: ConversationGateway;
 
   const sendMessageUseCaseMock = { execute: jest.fn() };

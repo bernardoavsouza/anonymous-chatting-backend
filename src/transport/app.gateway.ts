@@ -3,9 +3,9 @@ import { ConnectConversationUseCase } from '@/domain/conversation/usecases/conne
 import { LeaveConversationUseCase } from '@/domain/conversation/usecases/leave.usecase';
 import { Injectable } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, WebSocketGateway } from '@nestjs/websockets';
-import { Socket } from 'socket.io';
 import { ConversationEvent } from './conversation/types';
 import type { InputPort } from './ports';
+import type { AppSocket } from './types';
 
 @Injectable()
 @WebSocketGateway()
@@ -15,9 +15,11 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly leaveConversationUseCase: LeaveConversationUseCase,
   ) {}
 
-  async handleConnection(client: Socket): Promise<void> {
-    const { nickname, conversationId } = client.handshake.auth;
-    const userId = await this.connectConversationUseCase.execute({ nickname, conversationId });
+  async handleConnection(client: AppSocket): Promise<void> {
+    const { nickname, conversationId: suggestedConversationId } = client.handshake.auth;
+    const { userId, conversationId } = await this.connectConversationUseCase.execute({
+      conversationId: suggestedConversationId,
+    });
 
     client.data = { userId, conversationId };
     client.join(conversationId);
@@ -27,7 +29,7 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
     } satisfies InputPort<ConnectedConversationDTO>);
   }
 
-  async handleDisconnect(client: Socket): Promise<void> {
+  async handleDisconnect(client: AppSocket): Promise<void> {
     const { userId, conversationId } = client.data;
     if (!userId || !conversationId) return;
 

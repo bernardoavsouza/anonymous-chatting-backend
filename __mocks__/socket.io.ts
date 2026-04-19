@@ -1,6 +1,6 @@
-import type { Socket } from 'socket.io';
+import type { AppSocket } from '@/transport/types';
 
-export class MockedSocket1 implements Partial<Socket> {
+export class MockedSocket1 implements Partial<AppSocket> {
   public emit = jest.fn();
   public on = jest.fn();
   public to = jest.fn().mockReturnThis();
@@ -12,7 +12,8 @@ export class MockedSocket1 implements Partial<Socket> {
   });
   public disconnect = jest.fn();
   public rooms = new Set<string>();
-  public handshake = { auth: {} as Record<string, string> } as Socket['handshake'];
+  public handshake = { auth: {} } as AppSocket['handshake'];
+  public data: AppSocket['data'] = {};
 }
 
-export const MockedSocket = jest.fn(() => new MockedSocket1()) as unknown as jest.Mock<Socket>;
+export const MockedSocket = jest.fn(() => new MockedSocket1()) as unknown as jest.Mock<AppSocket>;

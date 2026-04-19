@@ -4,19 +4,20 @@ import { LeaveConversationUseCase } from '@/domain/conversation/usecases/leave.u
 import { AppGateway } from '@/transport/app.gateway';
 import { ConversationEvent } from '@/transport/conversation/types';
 import type { InputPort } from '@/transport/ports';
+import type { AppSocket } from '@/transport/types';
 import { Test } from '@nestjs/testing';
-import type { Socket } from 'socket.io';
 import { dummyConversation, dummyUsers } from '~/dummies';
 import { MockedSocket } from '~/socket.io';
 
 describe('AppGateway (handleConnection)', () => {
-  let socket: Socket;
+  let socket: AppSocket;
   let gateway: AppGateway;
 
   const connectUseCaseMock = { execute: jest.fn() };
 
   beforeEach(async () => {
     jest.clearAllMocks();
+    connectUseCaseMock.execute.mockResolvedValue({ userId: dummyUsers[0].id, conversationId: dummyConversation.id });
     socket = MockedSocket();
 
     const app = await Test.createTestingModule({
@@ -30,25 +31,24 @@ describe('AppGateway (handleConnection)', () => {
     gateway = app.get(AppGateway);
   });
 
-  it('should call the use case with nickname and no conversationId when not provided', async () => {
+  it('should call the use case with no conversationId when not provided', async () => {
     socket.handshake.auth = { nickname: dummyUsers[0].nickname };
 
     await gateway.handleConnection(socket);
 
-    expect(connectUseCaseMock.execute).toHaveBeenCalledWith({ nickname: dummyUsers[0].nickname, conversationId: undefined });
+    expect(connectUseCaseMock.execute).toHaveBeenCalledWith({ conversationId: undefined });
   });
 
-  it('should call the use case with nickname and conversationId when provided', async () => {
+  it('should call the use case with conversationId when provided', async () => {
     socket.handshake.auth = { nickname: dummyUsers[0].nickname, conversationId: dummyConversation.id };
 
     await gateway.handleConnection(socket);
 
-    expect(connectUseCaseMock.execute).toHaveBeenCalledWith({ nickname: dummyUsers[0].nickname, conversationId: dummyConversation.id });
+    expect(connectUseCaseMock.execute).toHaveBeenCalledWith({ conversationId: dummyConversation.id });
   });
 
   it('should store userId and conversationId in socket.data', async () => {
     socket.handshake.auth = { nickname: dummyUsers[0].nickname, conversationId: dummyConversation.id };
-    connectUseCaseMock.execute.mockResolvedValueOnce(dummyUsers[0].id);
 
     await gateway.handleConnection(socket);
 
@@ -57,7 +57,6 @@ describe('AppGateway (handleConnection)', () => {
 
   it('should emit join event with nickname, userId and conversationId', async () => {
     socket.handshake.auth = { nickname: dummyUsers[0].nickname, conversationId: dummyConversation.id };
-    connectUseCaseMock.execute.mockResolvedValueOnce(dummyUsers[0].id);
 
     await gateway.handleConnection(socket);
 
