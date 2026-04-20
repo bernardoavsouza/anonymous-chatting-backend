@@ -1,11 +1,10 @@
-import { ConnectedConversationDTO, LeaveConversationDTO } from '@/domain/conversation/dto';
 import { ConnectConversationUseCase } from '@/domain/conversation/usecases/connect.usecase';
 import { LeaveConversationUseCase } from '@/domain/conversation/usecases/leave.usecase';
 import { Injectable } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, WebSocketGateway } from '@nestjs/websockets';
 import { ConversationEvent } from './conversation/types';
 import type { InputPort } from './ports';
-import type { AppSocket } from './types';
+import type { AppSocket, ConnectedInConversationDTO, LeftConversationDTO } from './types';
 
 @Injectable()
 @WebSocketGateway()
@@ -19,25 +18,26 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const { nickname, conversationId: suggestedConversationId } = client.handshake.auth;
     const { userId, conversationId } = await this.connectConversationUseCase.execute({
       conversationId: suggestedConversationId,
+      nickname,
     });
 
-    client.data = { userId, conversationId };
+    client.data = { userId, nickname, conversationId };
     client.join(conversationId);
     client.to(conversationId).emit(ConversationEvent.JOIN, {
-      data: { nickname, userId, conversationId },
+      data: { nickname, conversationId },
       timestamp: new Date(),
-    } satisfies InputPort<ConnectedConversationDTO>);
+    } satisfies InputPort<ConnectedInConversationDTO>);
   }
 
   async handleDisconnect(client: AppSocket): Promise<void> {
-    const { userId, conversationId } = client.data;
-    if (!userId || !conversationId) return;
+    const { userId, nickname, conversationId } = client.data;
+    if (!userId || !nickname || !conversationId) return;
 
-    await this.leaveConversationUseCase.execute({ userId, conversationId });
+    await this.leaveConversationUseCase.execute({ nickname, conversationId });
 
     client.leave(conversationId);
     client
       .to(conversationId)
-      .emit(ConversationEvent.LEAVE, { data: { userId, conversationId }, timestamp: new Date() } satisfies InputPort<LeaveConversationDTO>);
+      .emit(ConversationEvent.LEAVE, { data: { nickname, conversationId }, timestamp: new Date() } satisfies InputPort<LeftConversationDTO>);
   }
 }

@@ -1,5 +1,6 @@
 import { LeaveConversationUseCase } from '@/domain/conversation/usecases/leave.usecase';
 import { SendMessageUseCase } from '@/domain/conversation/usecases/send-message.usecase';
+import type { ConversationLeaveInputDTO } from '@/transport/conversation/dto';
 import { ConversationEvent } from '@/transport/conversation/types';
 import type { InputPort } from '@/transport/ports';
 import type { AppSocket } from '@/transport/types';
@@ -21,6 +22,7 @@ describe('Conversation leave event', () => {
 
   beforeEach(async () => {
     socket = MockedSocket();
+    socket.data = { nickname: dummyUsers[0].nickname, conversationId: dummyConversation.id };
     const app = await Test.createTestingModule({
       providers: [
         ConversationGateway,
@@ -32,27 +34,27 @@ describe('Conversation leave event', () => {
   });
 
   it('should leave socket room', async () => {
-    await gateway.handleLeave({ data: { userId: dummyUsers[0].id, conversationId: dummyConversation.id }, timestamp: dummyDate }, socket);
+    await gateway.handleLeave({ data: { conversationId: dummyConversation.id }, timestamp: dummyDate }, socket);
 
     expect(socket.leave).toHaveBeenCalledWith(dummyConversation.id);
   });
 
   it('should emit leave event to the conversation', async () => {
-    await gateway.handleLeave({ data: { userId: dummyUsers[0].id, conversationId: dummyConversation.id }, timestamp: dummyDate }, socket);
+    await gateway.handleLeave({ data: { conversationId: dummyConversation.id }, timestamp: dummyDate }, socket);
 
     expect(socket.to).toHaveBeenCalledWith(dummyConversation.id);
     expect(socket.to(dummyConversation.id).emit).toHaveBeenCalledWith(ConversationEvent.LEAVE, {
-      data: { conversationId: dummyConversation.id, userId: dummyUsers[0].id },
+      data: { conversationId: dummyConversation.id },
       timestamp: dummyDate,
-    } satisfies InputPort<{ conversationId: string; userId: string }>);
+    } satisfies InputPort<ConversationLeaveInputDTO>);
   });
 
-  it('should call leave use case with data', async () => {
-    await gateway.handleLeave({ data: { userId: dummyUsers[0].id, conversationId: dummyConversation.id }, timestamp: dummyDate }, socket);
+  it('should call leave use case with data from socket.data', async () => {
+    await gateway.handleLeave({ data: { conversationId: dummyConversation.id }, timestamp: dummyDate }, socket);
 
     expect(leaveUseCaseMock.execute).toHaveBeenCalledWith({
+      nickname: dummyUsers[0].nickname,
       conversationId: dummyConversation.id,
-      userId: dummyUsers[0].id,
     });
   });
 });

@@ -1,13 +1,9 @@
 import { Message } from '@/domain/conversation/interfaces';
-import { User } from '@/domain/interfaces';
 import { IsUUID } from 'class-validator';
 
 export class ConversationMessageInputDTO extends Message {}
 
 export class ConversationLeaveInputDTO {
-  @IsUUID()
-  userId: User['id'];
-
   @IsUUID()
   conversationId: Message['conversationId'];
 }

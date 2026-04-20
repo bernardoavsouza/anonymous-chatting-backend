@@ -22,17 +22,17 @@ describe('LeaveConversationUseCase', () => {
   });
 
   it('should erase conversation in redis on leave if you are the last user', async () => {
-    redisMock.getDetails.mockResolvedValueOnce({ users: [dummyUsers[0].id] });
+    redisMock.getDetails.mockResolvedValueOnce({ users: [dummyUsers[0].nickname] });
 
-    await useCase.execute({ conversationId: dummyConversation.id, userId: dummyUsers[0].id });
+    await useCase.execute({ conversationId: dummyConversation.id, nickname: dummyUsers[0].nickname });
 
     expect(redisMock.eraseConversation).toHaveBeenCalledWith(dummyConversation.id);
   });
 
   it('should not erase conversation in redis on leave if you are not the last user', async () => {
-    redisMock.getDetails.mockResolvedValueOnce({ users: [dummyUsers[0].id, dummyUsers[1].id] });
+    redisMock.getDetails.mockResolvedValueOnce({ users: [dummyUsers[0].nickname, dummyUsers[1].nickname] });
 
-    await useCase.execute({ conversationId: dummyConversation.id, userId: dummyUsers[1].id });
+    await useCase.execute({ conversationId: dummyConversation.id, nickname: dummyUsers[1].nickname });
 
     expect(redisMock.eraseConversation).not.toHaveBeenCalled();
   });

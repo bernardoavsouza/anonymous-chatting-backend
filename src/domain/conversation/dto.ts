@@ -4,20 +4,10 @@ import type { User } from '@/domain/interfaces';
 
 export class ConnectConversationInputDTO {
   conversationId?: Conversation['id'];
+  nickname: User['nickname'];
 }
 
 export class ConnectConversationOutputDTO {
-  conversationId: Conversation['id'];
-  userId: User['id'];
-}
-
-export class ConnectedConversationDTO {
-  nickname: User['nickname'];
-  userId: User['id'];
-  conversationId: Conversation['id'];
-}
-
-export class JoinConversationDTO {
   conversationId: Conversation['id'];
   userId: User['id'];
 }
@@ -26,5 +16,5 @@ export class SendMessageDTO extends Message {}
 
 export class LeaveConversationDTO {
   conversationId: Conversation['id'];
-  userId: User['id'];
+  nickname: User['nickname'];
 }

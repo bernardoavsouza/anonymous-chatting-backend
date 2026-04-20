@@ -21,7 +21,8 @@ const conversationId = randomUUID();
 export const dummyMessage: Message = {
   content: 'dummy message',
   conversationId,
-  senderId: randomUUID(),
+  nickname: dummyUsers[0].nickname,
+  createdAt: dummyDate,
 };
 
 export const dummyConversation: Conversation = {

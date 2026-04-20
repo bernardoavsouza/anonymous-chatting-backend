@@ -17,7 +17,7 @@ describe('AppGateway (handleDisconnect)', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
     socket = MockedSocket();
-    socket.data = { userId: dummyUsers[0].id, conversationId: dummyConversation.id };
+    socket.data = { userId: dummyUsers[0].id, nickname: dummyUsers[0].nickname, conversationId: dummyConversation.id };
 
     const app = await Test.createTestingModule({
       providers: [
@@ -41,16 +41,16 @@ describe('AppGateway (handleDisconnect)', () => {
 
     expect(socket.to).toHaveBeenCalledWith(dummyConversation.id);
     expect(socket.to(dummyConversation.id).emit).toHaveBeenCalledWith(ConversationEvent.LEAVE, {
-      data: { userId: dummyUsers[0].id, conversationId: dummyConversation.id },
+      data: { nickname: dummyUsers[0].nickname, conversationId: dummyConversation.id },
       timestamp: expect.any(Date),
-    } satisfies InputPort<{ userId: string; conversationId: string }>);
+    } satisfies InputPort<{ nickname: string; conversationId: string }>);
   });
 
   it('should call leave use case with data from socket.data', async () => {
     await gateway.handleDisconnect(socket);
 
     expect(leaveUseCaseMock.execute).toHaveBeenCalledWith({
-      userId: dummyUsers[0].id,
+      nickname: dummyUsers[0].nickname,
       conversationId: dummyConversation.id,
     });
   });

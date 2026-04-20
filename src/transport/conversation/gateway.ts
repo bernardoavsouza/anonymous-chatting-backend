@@ -33,7 +33,13 @@ export class ConversationGateway {
     @WsBody(ConversationLeaveInputDTO) input: InputPort<ConversationLeaveInputDTO>,
     @ConnectedSocket() client: AppSocket,
   ): Promise<void> {
-    await this.leaveUseCase.execute(input.data);
+    const { nickname, conversationId } = client.data;
+
+    if (!nickname || !conversationId) {
+      return;
+    }
+
+    await this.leaveUseCase.execute({ nickname, conversationId });
 
     client.leave(input.data.conversationId);
     client

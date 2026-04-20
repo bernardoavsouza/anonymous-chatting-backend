@@ -1,10 +1,9 @@
-import type { ConnectedConversationDTO } from '@/domain/conversation/dto';
 import { ConnectConversationUseCase } from '@/domain/conversation/usecases/connect.usecase';
 import { LeaveConversationUseCase } from '@/domain/conversation/usecases/leave.usecase';
 import { AppGateway } from '@/transport/app.gateway';
 import { ConversationEvent } from '@/transport/conversation/types';
 import type { InputPort } from '@/transport/ports';
-import type { AppSocket } from '@/transport/types';
+import type { AppSocket, ConnectedInConversationDTO } from '@/transport/types';
 import { Test } from '@nestjs/testing';
 import { dummyConversation, dummyUsers } from '~/dummies';
 import { MockedSocket } from '~/socket.io';
@@ -36,7 +35,7 @@ describe('AppGateway (handleConnection)', () => {
 
     await gateway.handleConnection(socket);
 
-    expect(connectUseCaseMock.execute).toHaveBeenCalledWith({ conversationId: undefined });
+    expect(connectUseCaseMock.execute).toHaveBeenCalledWith({ conversationId: undefined, nickname: dummyUsers[0].nickname });
   });
 
   it('should call the use case with conversationId when provided', async () => {
@@ -44,26 +43,26 @@ describe('AppGateway (handleConnection)', () => {
 
     await gateway.handleConnection(socket);
 
-    expect(connectUseCaseMock.execute).toHaveBeenCalledWith({ conversationId: dummyConversation.id });
+    expect(connectUseCaseMock.execute).toHaveBeenCalledWith({ conversationId: dummyConversation.id, nickname: dummyUsers[0].nickname });
   });
 
-  it('should store userId and conversationId in socket.data', async () => {
+  it('should store userId, nickname and conversationId in socket.data', async () => {
     socket.handshake.auth = { nickname: dummyUsers[0].nickname, conversationId: dummyConversation.id };
 
     await gateway.handleConnection(socket);
 
-    expect(socket.data).toEqual({ userId: dummyUsers[0].id, conversationId: dummyConversation.id });
+    expect(socket.data).toEqual({ userId: dummyUsers[0].id, nickname: dummyUsers[0].nickname, conversationId: dummyConversation.id });
   });
 
-  it('should emit join event with nickname, userId and conversationId', async () => {
+  it('should emit join event with nickname and conversationId', async () => {
     socket.handshake.auth = { nickname: dummyUsers[0].nickname, conversationId: dummyConversation.id };
 
     await gateway.handleConnection(socket);
 
     expect(socket.to).toHaveBeenCalledWith(dummyConversation.id);
     expect(socket.to(dummyConversation.id).emit).toHaveBeenCalledWith(ConversationEvent.JOIN, {
-      data: { nickname: dummyUsers[0].nickname, userId: dummyUsers[0].id, conversationId: dummyConversation.id },
+      data: { nickname: dummyUsers[0].nickname, conversationId: dummyConversation.id },
       timestamp: expect.any(Date),
-    } satisfies InputPort<ConnectedConversationDTO>);
+    } satisfies InputPort<ConnectedInConversationDTO>);
   });
 });

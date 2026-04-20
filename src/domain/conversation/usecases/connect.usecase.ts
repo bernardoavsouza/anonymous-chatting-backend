@@ -10,11 +10,11 @@ import { Conversation } from '../interfaces';
 export class ConnectConversationUseCase implements UseCase<ConnectConversationInputDTO, ConnectConversationOutputDTO> {
   constructor(private readonly redis: RedisDatasource) {}
 
-  async execute({ conversationId }: ConnectConversationInputDTO): Promise<ConnectConversationOutputDTO> {
+  async execute({ conversationId, nickname }: ConnectConversationInputDTO): Promise<ConnectConversationOutputDTO> {
     const userId = randomUUID();
 
     if (!conversationId) {
-      const newConversationId = await this.createConversation(userId);
+      const newConversationId = await this.createConversation(nickname);
       return {
         userId,
         conversationId: newConversationId,
@@ -37,9 +37,9 @@ export class ConnectConversationUseCase implements UseCase<ConnectConversationIn
     };
   }
 
-  private async createConversation(userId: User['id']): Promise<Conversation['id']> {
+  private async createConversation(nickname: User['nickname']): Promise<Conversation['id']> {
     const conversationId = randomUUID();
-    await this.redis.upsertDetails({ conversationId, userId });
+    await this.redis.upsertDetails({ conversationId, nickname });
     return conversationId;
   }
 }

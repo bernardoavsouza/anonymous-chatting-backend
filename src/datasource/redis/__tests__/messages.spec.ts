@@ -1,3 +1,4 @@
+import type { ConversationDetails, Message } from '@/domain/conversation/interfaces';
 import { ConfigService } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
 import { dummyConversation, dummyDate, dummyMessage, dummyUsers } from '~/dummies';
@@ -30,38 +31,38 @@ describe('Redis messages service', () => {
     expect(redisService.client.rpush).toHaveBeenCalledWith(
       dummyMessage.conversationId,
       JSON.stringify({
-        message: dummyMessage.content,
-        userId: dummyMessage.senderId,
-        timestamp: dummyDate,
-      }),
+        content: dummyMessage.content,
+        nickname: dummyMessage.nickname,
+        createdAt: dummyDate,
+      } satisfies Omit<Message, 'conversationId'>),
     );
   });
 
   it('should be able to create conversation details', async () => {
     await redisService.upsertDetails({
       conversationId: dummyConversation.id,
-      userId: dummyUsers[0].id,
+      nickname: dummyUsers[0].nickname,
     });
 
     expect(redisService.client.set).toHaveBeenCalledWith(
       `details-${dummyConversation.id}`,
       JSON.stringify({
         conversationId: dummyConversation.id,
-        users: [dummyUsers[0].id],
+        users: [dummyUsers[0].nickname],
         createdAt: dummyDate,
-      }),
+      } satisfies ConversationDetails),
     );
   });
 
   it('should be able to add new users to conversation details', async () => {
     await redisService.upsertDetails({
       conversationId: dummyConversation.id,
-      userId: dummyUsers[0].id,
+      nickname: dummyUsers[0].nickname,
     });
 
     await redisService.upsertDetails({
       conversationId: dummyConversation.id,
-      userId: dummyUsers[1].id,
+      nickname: dummyUsers[1].nickname,
     });
 
     const redisSetter = redisService.client.set as jest.Mock;
@@ -70,9 +71,9 @@ describe('Redis messages service', () => {
       `details-${dummyConversation.id}`,
       JSON.stringify({
         conversationId: dummyConversation.id,
-        users: [dummyUsers[0].id, dummyUsers[1].id],
+        users: [dummyUsers[0].nickname, dummyUsers[1].nickname],
         createdAt: dummyDate,
-      }),
+      } satisfies ConversationDetails),
     ]);
   });
 });

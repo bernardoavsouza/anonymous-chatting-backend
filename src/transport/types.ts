@@ -11,6 +11,17 @@ export type AppSocket = Omit<Socket, 'handshake' | 'data'> & {
   };
   data: {
     userId?: User['id'];
+    nickname?: User['nickname'];
     conversationId?: Conversation['id'];
   };
 };
+
+export class ConnectedInConversationDTO {
+  nickname: User['nickname'];
+  conversationId: Conversation['id'];
+}
+
+export class LeftConversationDTO {
+  conversationId: Conversation['id'];
+  nickname: User['nickname'];
+}

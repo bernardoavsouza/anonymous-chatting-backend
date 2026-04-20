@@ -33,6 +33,10 @@ export class Message {
   @IsUUID()
   conversationId: Conversation['id'];
 
-  @IsUUID()
-  senderId: User['id'];
+  @IsString()
+  nickname: User['nickname'];
+
+  @IsDate()
+  @Transform(({ value }) => new Date(value))
+  createdAt: Date;
 }

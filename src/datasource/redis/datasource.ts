@@ -16,10 +16,10 @@ export class RedisDatasource {
     await this.client.rpush(
       message.conversationId,
       JSON.stringify({
-        message: message.content,
-        userId: message.senderId,
-        timestamp: new Date(),
-      }),
+        content: message.content,
+        nickname: message.nickname,
+        createdAt: new Date(),
+      } satisfies Omit<Message, 'conversationId'>),
     );
   }
 
@@ -32,7 +32,7 @@ export class RedisDatasource {
     return JSON.parse(details);
   }
 
-  async upsertDetails({ conversationId, userId }: { conversationId: Conversation['id']; userId: User['id'] }): Promise<void> {
+  async upsertDetails({ conversationId, nickname }: { conversationId: Conversation['id']; nickname: User['nickname'] }): Promise<void> {
     const details = await this.getDetails(conversationId);
 
     if (!details) {
@@ -40,7 +40,7 @@ export class RedisDatasource {
         `details-${conversationId}`,
         JSON.stringify({
           conversationId,
-          users: [userId],
+          users: [nickname],
           createdAt: new Date(),
         } satisfies ConversationDetails),
       );
@@ -51,7 +51,7 @@ export class RedisDatasource {
       `details-${conversationId}`,
       JSON.stringify({
         ...details,
-        users: [...details.users, userId],
+        users: [...details.users, nickname],
       } satisfies ConversationDetails),
     );
   }
