@@ -57,4 +57,12 @@ describe('Conversation leave event', () => {
       conversationId: dummyConversation.id,
     });
   });
+
+  it('should not call leave use case when socket has no user data', async () => {
+    socket.data = {};
+
+    await gateway.handleLeave({ data: { conversationId: dummyConversation.id }, timestamp: dummyDate }, socket);
+
+    expect(leaveUseCaseMock.execute).not.toHaveBeenCalled();
+  });
 });

@@ -2,6 +2,7 @@ import { Conversation, ConversationDetails, Message } from '@/domain/conversatio
 import { User } from '@/domain/interfaces';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { plainToInstance } from 'class-transformer';
 import Redis from 'ioredis';
 
 @Injectable()
@@ -29,7 +30,7 @@ export class RedisDatasource {
       return null;
     }
 
-    return JSON.parse(details);
+    return plainToInstance(ConversationDetails, JSON.parse(details));
   }
 
   async upsertDetails({ conversationId, nickname }: { conversationId: Conversation['id']; nickname: User['nickname'] }): Promise<void> {

@@ -36,4 +36,12 @@ describe('LeaveConversationUseCase', () => {
 
     expect(redisMock.eraseConversation).not.toHaveBeenCalled();
   });
+
+  it('should not erase conversation in redis when conversation details are not found', async () => {
+    redisMock.getDetails.mockResolvedValueOnce(null);
+
+    await useCase.execute({ conversationId: dummyConversation.id, nickname: dummyUsers[0].nickname });
+
+    expect(redisMock.eraseConversation).not.toHaveBeenCalled();
+  });
 });
