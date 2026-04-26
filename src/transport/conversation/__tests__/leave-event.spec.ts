@@ -2,6 +2,8 @@ import { LeaveConversationUseCase } from '@/domain/conversation/usecases/leave.u
 import { SendMessageUseCase } from '@/domain/conversation/usecases/send-message.usecase';
 import type { ConversationLeaveInputDTO } from '@/transport/conversation/dto';
 import { ConversationEvent } from '@/transport/conversation/types';
+import { ErrorCode } from '@/transport/errors/codes';
+import { ConversationError } from '@/transport/errors/conversation.error';
 import type { InputPort } from '@/transport/ports';
 import type { AppSocket } from '@/transport/types';
 import { Test } from '@nestjs/testing';
@@ -64,5 +66,29 @@ describe('Conversation leave event', () => {
     await gateway.handleLeave({ data: { conversationId: dummyConversation.id }, timestamp: dummyDate }, socket);
 
     expect(leaveUseCaseMock.execute).not.toHaveBeenCalled();
+  });
+
+  it('should emit INVALID_AUTH error when socket has no user data', async () => {
+    socket.data = {};
+
+    await gateway.handleLeave({ data: { conversationId: dummyConversation.id }, timestamp: dummyDate }, socket);
+
+    expect(socket.emit).toHaveBeenCalledWith('error', { code: ErrorCode.INVALID_AUTH, message: expect.any(String) });
+  });
+
+  it('should emit INTERNAL_ERROR when use case throws ConversationError', async () => {
+    leaveUseCaseMock.execute.mockRejectedValueOnce(new ConversationError(ErrorCode.INTERNAL_ERROR, 'redis down'));
+
+    await gateway.handleLeave({ data: { conversationId: dummyConversation.id }, timestamp: dummyDate }, socket);
+
+    expect(socket.emit).toHaveBeenCalledWith('error', { code: ErrorCode.INTERNAL_ERROR, message: 'redis down' });
+  });
+
+  it('should emit INTERNAL_ERROR when use case throws unexpected error', async () => {
+    leaveUseCaseMock.execute.mockRejectedValueOnce(new Error('unexpected'));
+
+    await gateway.handleLeave({ data: { conversationId: dummyConversation.id }, timestamp: dummyDate }, socket);
+
+    expect(socket.emit).toHaveBeenCalledWith('error', { code: ErrorCode.INTERNAL_ERROR, message: 'Internal Server Error' });
   });
 });

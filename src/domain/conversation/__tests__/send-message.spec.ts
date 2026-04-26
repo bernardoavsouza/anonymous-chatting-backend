@@ -1,4 +1,5 @@
 import { RedisDatasource } from '@/datasource/redis/datasource';
+import { ConversationError } from '@/transport/errors/conversation.error';
 import { Test } from '@nestjs/testing';
 import { dummyMessage } from '~/dummies';
 import { SendMessageUseCase } from '../usecases/send-message.usecase';
@@ -24,5 +25,11 @@ describe('SendMessageUseCase', () => {
     await useCase.execute(dummyMessage);
 
     expect(redisMock.appendMessage).toHaveBeenCalledWith(dummyMessage);
+  });
+
+  it('should throw ConversationError when redis.appendMessage rejects', async () => {
+    redisMock.appendMessage.mockRejectedValueOnce(new Error('redis down'));
+
+    await expect(useCase.execute(dummyMessage)).rejects.toBeInstanceOf(ConversationError);
   });
 });

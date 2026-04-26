@@ -1,4 +1,6 @@
 import { RedisDatasource } from '@/datasource/redis/datasource';
+import { ErrorCode } from '@/transport/errors/codes';
+import { ConversationError } from '@/transport/errors/conversation.error';
 import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import type { User } from '../../interfaces';
@@ -15,31 +17,31 @@ export class ConnectConversationUseCase implements UseCase<ConnectConversationIn
 
     if (!conversationId) {
       const newConversationId = await this.createConversation(nickname);
-      return {
-        userId,
-        conversationId: newConversationId,
-      };
+      return { userId, conversationId: newConversationId };
     }
 
-    const existing = await this.redis.getDetails(conversationId);
+    let existing;
+    try {
+      existing = await this.redis.getDetails(conversationId);
+    } catch (error) {
+      throw new ConversationError(ErrorCode.INTERNAL_ERROR, (error as Error).message);
+    }
 
     if (existing) {
-      return {
-        userId,
-        conversationId,
-      };
+      return { userId, conversationId };
     }
 
     const newConversationId = await this.createConversation(userId);
-    return {
-      userId,
-      conversationId: newConversationId,
-    };
+    return { userId, conversationId: newConversationId };
   }
 
   private async createConversation(nickname: User['nickname']): Promise<Conversation['id']> {
     const conversationId = randomUUID();
-    await this.redis.upsertDetails({ conversationId, nickname });
+    try {
+      await this.redis.upsertDetails({ conversationId, nickname });
+    } catch (error) {
+      throw new ConversationError(ErrorCode.INTERNAL_ERROR, (error as Error).message);
+    }
     return conversationId;
   }
 }

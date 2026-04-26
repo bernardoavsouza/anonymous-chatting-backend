@@ -62,4 +62,18 @@ describe('AppGateway (handleDisconnect)', () => {
 
     expect(leaveUseCaseMock.execute).not.toHaveBeenCalled();
   });
+
+  it('should resolve without throwing when use case rejects', async () => {
+    leaveUseCaseMock.execute.mockRejectedValueOnce(new Error('redis down'));
+
+    await expect(gateway.handleDisconnect(socket)).resolves.toBeUndefined();
+  });
+
+  it('should not emit error event when use case rejects during disconnect', async () => {
+    leaveUseCaseMock.execute.mockRejectedValueOnce(new Error('redis down'));
+
+    await gateway.handleDisconnect(socket);
+
+    expect(socket.emit).not.toHaveBeenCalledWith('error', expect.anything());
+  });
 });

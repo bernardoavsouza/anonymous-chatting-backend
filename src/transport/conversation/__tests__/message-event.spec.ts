@@ -1,6 +1,8 @@
 import { LeaveConversationUseCase } from '@/domain/conversation/usecases/leave.usecase';
 import { SendMessageUseCase } from '@/domain/conversation/usecases/send-message.usecase';
 import { ConversationEvent } from '@/transport/conversation/types';
+import { ErrorCode } from '@/transport/errors/codes';
+import { ConversationError } from '@/transport/errors/conversation.error';
 import type { InputPort } from '@/transport/ports';
 import type { AppSocket } from '@/transport/types';
 import { Test } from '@nestjs/testing';
@@ -55,5 +57,29 @@ describe('Conversation message event', () => {
     await gateway.handleMessage({ data: dummyMessage, timestamp: dummyDate }, socket);
 
     expect(sendMessageUseCaseMock.execute).not.toHaveBeenCalled();
+  });
+
+  it('should emit NOT_IN_ROOM error when client is not in the room', async () => {
+    await gateway.handleMessage({ data: dummyMessage, timestamp: dummyDate }, socket);
+
+    expect(socket.emit).toHaveBeenCalledWith('error', { code: ErrorCode.NOT_IN_ROOM, message: expect.any(String) });
+  });
+
+  it('should emit INTERNAL_ERROR when use case throws ConversationError', async () => {
+    socket.join(dummyMessage.conversationId);
+    sendMessageUseCaseMock.execute.mockRejectedValueOnce(new ConversationError(ErrorCode.INTERNAL_ERROR, 'redis down'));
+
+    await gateway.handleMessage({ data: dummyMessage, timestamp: dummyDate }, socket);
+
+    expect(socket.emit).toHaveBeenCalledWith('error', { code: ErrorCode.INTERNAL_ERROR, message: 'redis down' });
+  });
+
+  it('should emit INTERNAL_ERROR when use case throws unexpected error', async () => {
+    socket.join(dummyMessage.conversationId);
+    sendMessageUseCaseMock.execute.mockRejectedValueOnce(new Error('unexpected'));
+
+    await gateway.handleMessage({ data: dummyMessage, timestamp: dummyDate }, socket);
+
+    expect(socket.emit).toHaveBeenCalledWith('error', { code: ErrorCode.INTERNAL_ERROR, message: 'Internal Server Error' });
   });
 });

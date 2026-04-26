@@ -2,6 +2,8 @@ import { ConnectConversationUseCase } from '@/domain/conversation/usecases/conne
 import { LeaveConversationUseCase } from '@/domain/conversation/usecases/leave.usecase';
 import { AppGateway } from '@/transport/app.gateway';
 import { ConversationEvent } from '@/transport/conversation/types';
+import { ErrorCode } from '@/transport/errors/codes';
+import { ConversationError } from '@/transport/errors/conversation.error';
 import type { InputPort } from '@/transport/ports';
 import type { AppSocket, ConnectedInConversationDTO } from '@/transport/types';
 import { Test } from '@nestjs/testing';
@@ -64,5 +66,51 @@ describe('AppGateway (handleConnection)', () => {
       data: { nickname: dummyUsers[0].nickname, conversationId: dummyConversation.id },
       timestamp: expect.any(Date),
     } satisfies InputPort<ConnectedInConversationDTO>);
+  });
+
+  it('should emit INVALID_AUTH error and disconnect when nickname is missing', async () => {
+    socket.handshake.auth = {} as AppSocket['handshake']['auth'];
+
+    await gateway.handleConnection(socket);
+
+    expect(socket.emit).toHaveBeenCalledWith('error', { code: ErrorCode.INVALID_AUTH, message: expect.any(String) });
+    expect(socket.disconnect).toHaveBeenCalled();
+  });
+
+  it('should emit INVALID_AUTH error and disconnect when nickname is empty string', async () => {
+    socket.handshake.auth = { nickname: '' };
+
+    await gateway.handleConnection(socket);
+
+    expect(socket.emit).toHaveBeenCalledWith('error', { code: ErrorCode.INVALID_AUTH, message: expect.any(String) });
+    expect(socket.disconnect).toHaveBeenCalled();
+  });
+
+  it('should not call ConnectConversationUseCase when nickname is missing', async () => {
+    socket.handshake.auth = {} as AppSocket['handshake']['auth'];
+
+    await gateway.handleConnection(socket);
+
+    expect(connectUseCaseMock.execute).not.toHaveBeenCalled();
+  });
+
+  it('should disconnect when use case throws ConversationError and emit the ConversationError', async () => {
+    socket.handshake.auth = { nickname: dummyUsers[0].nickname };
+    connectUseCaseMock.execute.mockRejectedValueOnce(new ConversationError(ErrorCode.INVALID_AUTH, 'random conversation error'));
+
+    await gateway.handleConnection(socket);
+
+    expect(socket.emit).toHaveBeenCalledWith('error', { code: ErrorCode.INVALID_AUTH, message: 'random conversation error' });
+    expect(socket.disconnect).toHaveBeenCalled();
+  });
+
+  it('should emit INTERNAL_ERROR and disconnect when use case throws unexpected error', async () => {
+    socket.handshake.auth = { nickname: dummyUsers[0].nickname };
+    connectUseCaseMock.execute.mockRejectedValueOnce(new Error('unexpected'));
+
+    await gateway.handleConnection(socket);
+
+    expect(socket.emit).toHaveBeenCalledWith('error', { code: ErrorCode.INTERNAL_ERROR, message: 'Internal Server Error' });
+    expect(socket.disconnect).toHaveBeenCalled();
   });
 });

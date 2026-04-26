@@ -1,5 +1,6 @@
 import { RedisDatasource } from '@/datasource/redis/datasource';
 import { ConnectConversationUseCase } from '@/domain/conversation/usecases/connect.usecase';
+import { ConversationError } from '@/transport/errors/conversation.error';
 import { Test } from '@nestjs/testing';
 import { dummyConversation, dummyUsers } from '~/dummies';
 
@@ -79,5 +80,19 @@ describe('ConnectConversationUseCase', () => {
 
     expect(conversationId).toEqual(uuidMatcher);
     expect(conversationId).not.toBe(dummyConversation.id);
+  });
+
+  it('should throw ConversationError when redis.getDetails rejects', async () => {
+    redisMock.getDetails.mockRejectedValueOnce(new Error('redis down'));
+
+    await expect(useCase.execute({ conversationId: dummyConversation.id, nickname: dummyUsers[0].nickname })).rejects.toBeInstanceOf(
+      ConversationError,
+    );
+  });
+
+  it('should throw ConversationError when redis.upsertDetails rejects', async () => {
+    redisMock.upsertDetails.mockRejectedValueOnce(new Error('redis down'));
+
+    await expect(useCase.execute({ nickname: dummyUsers[0].nickname })).rejects.toBeInstanceOf(ConversationError);
   });
 });
