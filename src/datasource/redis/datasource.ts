@@ -1,12 +1,13 @@
 import { Conversation, ConversationDetails, Message } from '@/domain/conversation/interfaces';
 import { User } from '@/domain/interfaces';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { plainToInstance } from 'class-transformer';
 import Redis from 'ioredis';
 
 @Injectable()
 export class RedisDatasource {
+  private readonly logger = new Logger(RedisDatasource.name);
   readonly client: Redis;
 
   constructor(private readonly config: ConfigService) {
@@ -14,18 +15,30 @@ export class RedisDatasource {
   }
 
   async appendMessage(message: Message): Promise<void> {
-    await this.client.rpush(
-      message.conversationId,
-      JSON.stringify({
-        content: message.content,
-        nickname: message.nickname,
-        createdAt: new Date(),
-      } satisfies Omit<Message, 'conversationId'>),
-    );
+    try {
+      await this.client.rpush(
+        message.conversationId,
+        JSON.stringify({
+          content: message.content,
+          nickname: message.nickname,
+          createdAt: new Date(),
+        } satisfies Omit<Message, 'conversationId'>),
+      );
+    } catch (error) {
+      this.logger.error('appendMessage: RPUSH failed', JSON.stringify({ conversationId: message.conversationId, error: (error as Error).message }));
+      throw error;
+    }
   }
 
   async getDetails(conversationId: Conversation['id']): Promise<ConversationDetails | null> {
-    const details = await this.client.get(`details-${conversationId}`);
+    let details: string | null;
+    try {
+      details = await this.client.get(`details-${conversationId}`);
+    } catch (error) {
+      this.logger.error('getDetails: GET failed', JSON.stringify({ conversationId, error: (error as Error).message }));
+      throw error;
+    }
+
     if (!details) {
       return null;
     }
@@ -37,27 +50,42 @@ export class RedisDatasource {
     const details = await this.getDetails(conversationId);
 
     if (!details) {
-      await this.client.set(
-        `details-${conversationId}`,
-        JSON.stringify({
-          conversationId,
-          users: [nickname],
-          createdAt: new Date(),
-        } satisfies ConversationDetails),
-      );
+      try {
+        await this.client.set(
+          `details-${conversationId}`,
+          JSON.stringify({
+            conversationId,
+            users: [nickname],
+            createdAt: new Date(),
+          } satisfies ConversationDetails),
+        );
+      } catch (error) {
+        this.logger.error('upsertDetails: SET failed', JSON.stringify({ conversationId, error: (error as Error).message }));
+        throw error;
+      }
       return;
     }
 
-    await this.client.set(
-      `details-${conversationId}`,
-      JSON.stringify({
-        ...details,
-        users: [...details.users, nickname],
-      } satisfies ConversationDetails),
-    );
+    try {
+      await this.client.set(
+        `details-${conversationId}`,
+        JSON.stringify({
+          ...details,
+          users: [...details.users, nickname],
+        } satisfies ConversationDetails),
+      );
+    } catch (error) {
+      this.logger.error('upsertDetails: SET failed', JSON.stringify({ conversationId, error: (error as Error).message }));
+      throw error;
+    }
   }
 
   async eraseConversation(conversationId: Conversation['id']): Promise<void> {
-    await this.client.del(conversationId);
+    try {
+      await this.client.del(conversationId);
+    } catch (error) {
+      this.logger.error('eraseConversation: DEL failed', JSON.stringify({ conversationId, error: (error as Error).message }));
+      throw error;
+    }
   }
 }

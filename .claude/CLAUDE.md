@@ -93,6 +93,31 @@ When adding a new use case, the spec should cover:
 2. Redis failure → `ConversationError(INTERNAL_ERROR, ...)`
 3. Any domain rule violations → appropriate `ConversationError`
 
+## Observability
+
+Structured logging is mandatory in every class that does meaningful work. Use NestJS `Logger` — never `console.log`.
+
+**Setup:** every injectable class must declare:
+
+```typescript
+private readonly logger = new Logger(ClassName.name);
+```
+
+**Log levels:**
+
+- `logger.log` — normal flow milestones (operation started, resource found, cleanup complete)
+- `logger.warn` — expected-but-notable situations (not found, skipped cleanup, client rejected)
+- `logger.error` — failures from Redis, unhandled exceptions, or anything that breaks the happy path
+
+**Context format:** always pass a second argument to the logger with `JSON.stringify({ ...relevantFields })`. Include identifiers that aid debugging (`socketId`, `conversationId`, `nickname`, `error.message`). Never include raw Error objects or user message content.
+
+```typescript
+this.logger.log('execute: starting', JSON.stringify({ nickname, conversationId }));
+this.logger.error('execute: Redis error', JSON.stringify({ conversationId, error: (error as Error).message }));
+```
+
+**Coverage requirement:** log at the entry point of every public method and at each significant branch (resource found vs. not found, last user vs. not, success vs. failure). A new use case, gateway method, or datasource method that lacks this coverage is incomplete.
+
 ## Keeping This File Current
 
 This file must always reflect the current state of the project. Whenever a structural or architectural decision changes — new conventions, new layers, renamed patterns, updated error codes, etc. — update the relevant section here as part of the same task. Do not defer CLAUDE.md updates to a separate step.
